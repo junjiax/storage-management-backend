@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "d:\\dotnet-backend\\dotnet-backend.csproj": {}
+    "D:\\dotnet-backend\\dotnet-backend.csproj": {}
   },
   "projects": {
-    "d:\\dotnet-backend\\dotnet-backend.csproj": {
+    "D:\\dotnet-backend\\dotnet-backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\dotnet-backend\\dotnet-backend.csproj",
+        "projectUniqueName": "D:\\dotnet-backend\\dotnet-backend.csproj",
         "projectName": "dotnet-backend",
-        "projectPath": "d:\\dotnet-backend\\dotnet-backend.csproj",
+        "projectPath": "D:\\dotnet-backend\\dotnet-backend.csproj",
         "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "d:\\dotnet-backend\\obj\\",
+        "outputPath": "D:\\dotnet-backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -53,6 +53,14 @@
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[9.0.8, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.10, )"
+            },
+            "Pomelo.EntityFrameworkCore.MySql": {
+              "target": "Package",
+              "version": "[9.0.0, )"
             }
           },
           "imports": [
