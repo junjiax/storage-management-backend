@@ -3,6 +3,7 @@ namespace dotnet_backend.Controllers
     using Microsoft.AspNetCore.Mvc;
     using dotnet_backend.Services;
 
+    [ApiController]
     [Route("/api/[controller]")]
     public class InventoryController : Controller
     {
