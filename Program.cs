@@ -1,6 +1,9 @@
-using Microsoft.EntityFrameworkCore;
 using dotnet_backend.Data;
 using dotnet_backend.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +22,28 @@ builder.Services.AddDbContext<StoreDbContext>(options =>
 
 // Application services
 builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+// JWT Authentication
+var jwtSection = builder.Configuration.GetSection("Jwt");
+builder.Services.AddAuthentication(options =>
+{
+	options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+	options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+	options.TokenValidationParameters = new TokenValidationParameters
+	{
+		ValidateIssuer = true,
+		ValidateAudience = true,
+		ValidateLifetime = true,
+		ValidateIssuerSigningKey = true,
+		ValidIssuer = jwtSection["Issuer"],
+		ValidAudience = jwtSection["Audience"],
+		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]!))
+	};
+});
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -36,6 +61,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
