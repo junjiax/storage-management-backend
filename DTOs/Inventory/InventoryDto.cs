@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace dotnet_backend.DTOs.Inventory
 {
-    public class UpdateInventoryRequest
+    public class InventoryRequest
     {
         [JsonPropertyName("productId")]
         public int ProductId { get; set; }

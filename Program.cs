@@ -14,15 +14,18 @@ builder.Services.AddEndpointsApiExplorer();
 
 // Add services to the container.
 builder.Services.AddDbContext<StoreDbContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 26))
-    )
+	options.UseMySql(
+		builder.Configuration.GetConnectionString("DefaultConnection"),
+		new MySqlServerVersion(new Version(8, 0, 26))
+	)
 );
 
 // Application services
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
 
 // JWT Authentication
 var jwtSection = builder.Configuration.GetSection("Jwt");
@@ -54,8 +57,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+	app.UseExceptionHandler("/Home/Error");
+	app.UseHsts();
 }
 
 app.UseHttpsRedirection();
@@ -64,8 +67,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}"
+	name: "default",
+	pattern: "{controller=Home}/{action=Index}"
 );
 
 app.Run();
