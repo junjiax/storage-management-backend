@@ -12,6 +12,18 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+// CORS for frontend on port 5173 (Vite)
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowVite", policy =>
+	{
+		policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173")
+			.AllowAnyHeader()
+			.AllowAnyMethod()
+			.AllowCredentials();
+	});
+});
+
 // Add services to the container.
 builder.Services.AddDbContext<StoreDbContext>(options =>
 	options.UseMySql(
@@ -23,6 +35,9 @@ builder.Services.AddDbContext<StoreDbContext>(options =>
 // Application services
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<dotnet_backend.Repositories.IUserRepository, dotnet_backend.Repositories.UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<dotnet_backend.Interfaces.IVnPayService, dotnet_backend.Services.VnPayService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
@@ -64,6 +79,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseCors("AllowVite");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllerRoute(
