@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using dotnet_backend.Services.Interfaces;
+using dotnet_backend.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,8 @@ builder.Services.AddDbContext<StoreDbContext>(options =>
 // Application services
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+
 
 // JWT Authentication
 var jwtSection = builder.Configuration.GetSection("Jwt");
