@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace dotnet_backend.DTOs.Category
 {
-    public class CreateCategoryRequest
+    public class CategoryRequest
     {
         [JsonPropertyName("categoryName")]
         public string CategoryName { get; set; } = string.Empty;

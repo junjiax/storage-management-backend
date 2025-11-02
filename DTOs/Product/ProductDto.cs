@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace dotnet_backend.DTOs.Product
 {
-    public class CreateProductRequest
+    public class ProductRequest
     {
         [JsonPropertyName("categoryId")]
         public int? CategoryId { get; set; }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace dotnet_backend.DTOs.Supplier
 {
-    public class CreateSupplierRequest
+    public class SupplierRequest
     {
         [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;

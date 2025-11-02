@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Mvc;
+using dotnet_backend.Services;
+using dotnet_backend.DTOs.Common;
+using dotnet_backend.DTOs.Inventory;
+
 namespace dotnet_backend.Controllers
 {
-    using Microsoft.AspNetCore.Mvc;
-    using dotnet_backend.Services;
-
     [ApiController]
     [Route("/api/[controller]")]
     public class InventoryController : Controller
@@ -15,11 +17,60 @@ namespace dotnet_backend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<ActionResult<ApiResponse<List<InventoryResponse>>>> Index()
         {
             var items = await _inventoryService.GetInventoryListAsync();
-            return View(items); 
+            return Ok(ApiResponse<List<InventoryResponse>>.Ok(items));
         }
-        
+
+        [HttpPost]
+        public async Task<IActionResult> AddInventory()
+        {
+            var items = await _inventoryService.AddInventoryItemAsync(new InventoryRequest());
+            return Ok(ApiResponse<InventoryResponse>.Ok(items));
+        }
+
+        [HttpPut("{inventoryId}")]
+        public async Task<IActionResult> UpdateInventory(int inventoryId, [FromBody] InventoryRequest request)
+        {
+            var updatedItem = await _inventoryService.UpdateInventoryItemAsync(inventoryId, request);
+            if (updatedItem == null)
+            {
+                return NotFound(ApiResponse<InventoryResponse>.Fail("Inventory item not found", 404));
+            }
+
+            return Ok(ApiResponse<InventoryResponse>.Ok(updatedItem));
+        }
+
+        [HttpDelete("{inventoryId}")]
+        public async Task<IActionResult> DeleteInventory(int inventoryId)
+        {
+            var success = await _inventoryService.DeleteInventoryItemAsync(inventoryId);
+            if (!success)
+            {
+                return NotFound(ApiResponse<bool>.Fail("Inventory item not found", 404));
+            }
+
+            return Ok(ApiResponse<bool>.Ok(true));
+        }
+
+        [HttpGet("{inventoryId}")]
+        public async Task<IActionResult> GetInventoryById(int inventoryId)
+        {
+            var item = await _inventoryService.GetInventoryItemByIdAsync(inventoryId);
+            if (item == null)
+            {
+                return NotFound(ApiResponse<InventoryResponse>.Fail("Inventory item not found", 404));
+            }
+
+            return Ok(ApiResponse<InventoryResponse>.Ok(item));
+        }
+
+        [HttpGet("exists/{inventoryId}")]
+        public async Task<IActionResult> InventoryItemExists(int inventoryId)
+        {
+            var exists = await _inventoryService.InventoryItemExistsAsync(inventoryId);
+            return Ok(ApiResponse<bool>.Ok(exists));
+        }
     }
 }

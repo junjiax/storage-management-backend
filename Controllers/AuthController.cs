@@ -74,12 +74,12 @@ namespace dotnet_backend.Controllers
 
 			var (token, expiresAt) = _tokenService.GenerateToken(user);
 			return Ok(ApiResponse<AuthResponse>.Ok(new AuthResponse
-			{   
+			{
 				Token = token,
 				ExpiresAt = expiresAt,
-					Username = user.Username,
-					Role = user.Role
-				},
+				Username = user.Username,
+				Role = user.Role
+			},
 				message: "Login successful",
 				statusCode: 200
 			));
