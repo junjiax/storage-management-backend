@@ -6,7 +6,8 @@ namespace dotnet_backend.Services.Interfaces
     public interface IOrderService
     {
         Task<Order> CreateOrderAsync(CreateOrderRequest request);
-        Task<Order?> GetOrderByIdAsync(int Id);
+        Task<Order?> GetOrderByIdAsync(int id);
         Task<List<Order>> GetAllOrdersAsync();
+        Task UpdateOrderStatusAsync(int id);
     }
 }

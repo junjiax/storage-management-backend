@@ -7,6 +7,7 @@ namespace dotnet_backend.DTOs.Payment
         public string OrderId { get; set; } = string.Empty;
         public string PaymentMethod { get; set; } = string.Empty;
         public string PaymentId { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
         public bool Success { get; set; }
         public string Token { get; set; } = string.Empty;
         public string VnPayResponseCode { get; set; } = string.Empty;

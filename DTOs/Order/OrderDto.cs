@@ -70,8 +70,8 @@ namespace dotnet_backend.DTOs.Order
         [JsonPropertyName("items")]
         public List<OrderItemResponse> Items { get; set; } = new();
 
-        [JsonPropertyName("payments")]
-        public List<OrderPaymentResponse> Payments { get; set; } = new();
+        // [JsonPropertyName("payments")]
+        // public List<OrderPaymentResponse> Payments { get; set; } = new();
     }
 
     public class OrderItemResponse
@@ -95,18 +95,18 @@ namespace dotnet_backend.DTOs.Order
         public decimal Subtotal { get; set; }
     }
 
-    public class OrderPaymentResponse
-    {
-        [JsonPropertyName("paymentId")]
-        public int PaymentId { get; set; }
+    // public class OrderPaymentResponse
+    // {
+    //     [JsonPropertyName("paymentId")]
+    //     public int PaymentId { get; set; }
 
-        [JsonPropertyName("amount")]
-        public decimal Amount { get; set; }
+    //     [JsonPropertyName("amount")]
+    //     public decimal Amount { get; set; }
 
-        [JsonPropertyName("paymentMethod")]
-        public string PaymentMethod { get; set; } = string.Empty;
+    //     [JsonPropertyName("paymentMethod")]
+    //     public PaymentMethod PaymentMethod { get; set; }
 
-        [JsonPropertyName("paymentDate")]
-        public DateTime PaymentDate { get; set; }
-    }
+    //     [JsonPropertyName("paymentDate")]
+    //     public DateTime PaymentDate { get; set; }
+    // }
 }

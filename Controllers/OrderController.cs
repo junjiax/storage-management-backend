@@ -45,13 +45,13 @@ namespace dotnet_backend.Controllers
                         Price = oi.Price,
                         Subtotal = oi.Subtotal
                     }).ToList(),
-                    Payments = order.Payments.Select(p => new OrderPaymentResponse
-                    {
-                        PaymentId = p.PaymentId,
-                        PaymentMethod = p.PaymentMethod,
-                        Amount = p.Amount,
-                        PaymentDate = p.PaymentDate
-                    }).ToList()
+                    // Payments = order.Payments.Select(p => new OrderPaymentResponse
+                    // {
+                    //     PaymentId = p.PaymentId,
+                    //     PaymentMethod = p.PaymentMethod,
+                    //     Amount = p.Amount,
+                    //     PaymentDate = p.PaymentDate
+                    // }).ToList()
                 };
 
                 return Ok(ApiResponse<OrderResponse>.Ok(
@@ -147,13 +147,13 @@ namespace dotnet_backend.Controllers
                     Subtotal = oi.Subtotal
                 }).ToList(),
 
-                Payments = order.Payments.Select(p => new OrderPaymentResponse
-                {
-                    PaymentId = p.PaymentId,
-                    PaymentMethod = p.PaymentMethod,
-                    Amount = p.Amount,
-                    PaymentDate = p.PaymentDate
-                }).ToList()
+                // Payments = order.Payments.Select(p => new OrderPaymentResponse
+                // {
+                //     PaymentId = p.PaymentId,
+                //     PaymentMethod = p.PaymentMethod,
+                //     Amount = p.Amount,
+                //     PaymentDate = p.PaymentDate
+                // }).ToList()
             };
         }
     }

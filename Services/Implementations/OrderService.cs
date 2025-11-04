@@ -85,6 +85,16 @@ namespace dotnet_backend.Services.Implementations
             return order;
         }
 
+        public async Task UpdateOrderStatusAsync(int id)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            if (order != null)
+            {
+                order.Status = "paid";
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<Order?> GetOrderByIdAsync(int orderId)
         {
             return await _context.Orders
