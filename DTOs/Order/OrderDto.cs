@@ -7,6 +7,9 @@ namespace dotnet_backend.DTOs.Order
         [JsonPropertyName("customerId")]
         public int? CustomerId { get; set; }
 
+        [JsonPropertyName("userId")]
+        public int? UserId { get; set; }
+
         [JsonPropertyName("promoId")]
         public int? PromoId { get; set; }
 
