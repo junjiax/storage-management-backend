@@ -205,14 +205,13 @@ namespace dotnet_backend.Repositories
          var reportStart = new DateTime(request.Year, request.Month, 1);
          var reportEndExclusive = reportStart.AddMonths(1);
 
-         Console.WriteLine($"Report Start: {reportStart}, Report End Exclusive: {reportEndExclusive}");
-         var activePromoTask = _context.Promotions
+         var activePromoTask = await _context.Promotions
              .CountAsync(p =>
                  p.StartDate < reportEndExclusive &&
                  p.EndDate >= reportStart
              );
 
-         var usedPromoTask = _context.Orders
+         var usedPromoTask = await _context.Orders
              .CountAsync(o =>
                  o.PromoId != null &&               
                  o.OrderDate >= reportStart &&     
@@ -222,8 +221,8 @@ namespace dotnet_backend.Repositories
 
          return new PromotionReportResponse
          {
-            TotalPromotionsActiveInMonth = await activePromoTask,
-            TotalPromotionsUsed = await usedPromoTask
+            TotalPromotionsActiveInMonth =  activePromoTask,
+            TotalPromotionsUsed = usedPromoTask
          };
       }
    }

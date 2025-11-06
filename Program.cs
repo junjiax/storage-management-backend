@@ -30,7 +30,7 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 builder.Services.AddDbContext<StoreDbContext>(options =>
 	options.UseMySql(
-		builder.Configuration.GetConnectionString("PDefaultConnection"),
+		builder.Configuration.GetConnectionString("DefaultConnection"),
 		new MySqlServerVersion(new Version(8, 0, 26))
 	)
 );
