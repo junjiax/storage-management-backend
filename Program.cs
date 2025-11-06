@@ -1,11 +1,12 @@
+﻿using System.Text;
 using dotnet_backend.Data;
+using dotnet_backend.Repositories;
 using dotnet_backend.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using dotnet_backend.Services.Interfaces;
 using dotnet_backend.Services.Implementations;
+using dotnet_backend.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +30,7 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 builder.Services.AddDbContext<StoreDbContext>(options =>
 	options.UseMySql(
-		builder.Configuration.GetConnectionString("DefaultConnection"),
+		builder.Configuration.GetConnectionString("PDefaultConnection"),
 		new MySqlServerVersion(new Version(8, 0, 26))
 	)
 );
@@ -44,6 +45,11 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+
+builder.Services.AddScoped<IReportService, ReportService>();
+
+// Đăng ký Repository
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
 
 
 // JWT Authentication
