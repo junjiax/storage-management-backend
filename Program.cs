@@ -47,7 +47,6 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<IReportService, ReportService>();
-
 // Đăng ký Repository
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 
