@@ -29,7 +29,7 @@ namespace dotnet_backend.Services
 			var vnp_CurrCode = vnpConfig["CurrCode"] ?? "VND";
 			var vnp_Locale = vnpConfig["Locale"] ?? "vn";
 
-			var orderId = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+			var orderId = model.OrderId; 
 			var createDate = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
 
 			var lib = new VnPayLibrary();
@@ -45,7 +45,7 @@ namespace dotnet_backend.Services
 			lib.AddRequestData("vnp_OrderInfo", model.OrderDescription);
 			lib.AddRequestData("vnp_OrderType", model.OrderType);
 			lib.AddRequestData("vnp_ReturnUrl", callbackUrl ?? string.Empty);
-			lib.AddRequestData("vnp_TxnRef", orderId);
+			lib.AddRequestData("vnp_TxnRef", orderId.ToString());
 
 			var paymentUrl = lib.CreateRequestUrl(vnp_Url, vnp_HashSecret);
 			return paymentUrl;
@@ -65,6 +65,7 @@ namespace dotnet_backend.Services
 				OrderId = full.OrderId,
 				PaymentMethod = full.PaymentMethod,
 				PaymentId = full.PaymentId,
+				Amount = full.Amount,
 				Success = full.Success,
 				Token = full.Token,
 				VnPayResponseCode = full.VnPayResponseCode

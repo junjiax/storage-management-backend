@@ -2,6 +2,7 @@ namespace dotnet_backend.DTOs.Payment
 {
     public class PaymentInformationDto
     {
+        public int OrderId { get; set; }
         public string OrderType { get; set; } = string.Empty;
         public double Amount { get; set; }
         public string OrderDescription { get; set; } = string.Empty;

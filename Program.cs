@@ -44,6 +44,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 builder.Services.AddScoped<IPromotionService, PromotionService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
