@@ -45,13 +45,6 @@ namespace dotnet_backend.Controllers
                         Price = oi.Price,
                         Subtotal = oi.Subtotal
                     }).ToList(),
-                    // Payments = order.Payments.Select(p => new OrderPaymentResponse
-                    // {
-                    //     PaymentId = p.PaymentId,
-                    //     PaymentMethod = p.PaymentMethod,
-                    //     Amount = p.Amount,
-                    //     PaymentDate = p.PaymentDate
-                    // }).ToList()
                 };
 
                 return Ok(ApiResponse<OrderResponse>.Ok(
@@ -86,6 +79,47 @@ namespace dotnet_backend.Controllers
                 ));
             }
         }
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> UpdateOrderStatusAndInventory(int id)
+        {
+            try
+            {
+                await _orderService.UpdateOrderStatusAndInventoryAsync(id);
+
+                return Ok(ApiResponse<string>.Ok(
+                    data: $"Order {id} status updated to 'paid' and inventory adjusted successfully.",
+                    message: "Order status updated successfully"
+                ));
+            }
+            catch (ArgumentException ex)
+            {
+                var errors = new Dictionary<string, string[]>
+        {
+            { "order", new[] { ex.Message } }
+        };
+
+                return BadRequest(ApiResponse<string>.Fail(
+                    message: "Invalid order data",
+                    statusCode: 400,
+                    errors: errors
+                ));
+            }
+            catch (Exception ex)
+            {
+                var errors = new Dictionary<string, string[]>
+        {
+            { "exception", new[] { ex.Message } }
+        };
+
+                return StatusCode(500, ApiResponse<string>.Fail(
+                    message: "Internal server error",
+                    statusCode: 500,
+                    errors: errors
+                ));
+            }
+        }
+
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetOrderById(int id)
@@ -147,13 +181,13 @@ namespace dotnet_backend.Controllers
                     Subtotal = oi.Subtotal
                 }).ToList(),
 
-                // Payments = order.Payments.Select(p => new OrderPaymentResponse
-                // {
-                //     PaymentId = p.PaymentId,
-                //     PaymentMethod = p.PaymentMethod,
-                //     Amount = p.Amount,
-                //     PaymentDate = p.PaymentDate
-                // }).ToList()
+                Payment = order.Payment is null ? null : new OrderPaymentResponse
+                {
+                    PaymentId = order.Payment.PaymentId,
+                    PaymentMethod = order.Payment.PaymentMethod,
+                    Amount = order.Payment.Amount,
+                    PaymentDate = order.Payment.PaymentDate
+                }
             };
         }
     }

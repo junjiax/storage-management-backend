@@ -46,7 +46,7 @@ namespace dotnet_backend.Controllers
 
             if (response.Success)
             {
-                await _orderService.UpdateOrderStatusAsync(int.Parse(response.OrderId));
+                await _orderService.UpdateOrderStatusAndInventoryAsync(int.Parse(response.OrderId));
                 var createPaymentRequest = new CreatePaymentRequest
                 {
                     OrderId = int.Parse(response.OrderId),

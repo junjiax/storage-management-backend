@@ -8,6 +8,6 @@ namespace dotnet_backend.Services.Interfaces
         Task<Order> CreateOrderAsync(CreateOrderRequest request);
         Task<Order?> GetOrderByIdAsync(int id);
         Task<List<Order>> GetAllOrdersAsync();
-        Task UpdateOrderStatusAsync(int id);
+        Task UpdateOrderStatusAndInventoryAsync(int id);
     }
 }
