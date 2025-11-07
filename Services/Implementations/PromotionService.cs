@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using dotnet_backend.Data;             // StoreDbContext
-using dotnet_backend.DTOs.Promotion;   // PromotionRequest / PromotionResponse
+using dotnet_backend.Data;           
+using dotnet_backend.DTOs.Promotion;  
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using dotnet_backend.Models; // <- Thêm dòng này ở PromotionService.cs
+using dotnet_backend.Models; 
 
 
 namespace dotnet_backend.Services
