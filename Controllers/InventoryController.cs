@@ -20,14 +20,14 @@ namespace dotnet_backend.Controllers
         public async Task<ActionResult<ApiResponse<List<InventoryResponse>>>> Index()
         {
             var items = await _inventoryService.GetInventoryListAsync();
-            return Ok(ApiResponse<List<InventoryResponse>>.Ok(items));
+            return Ok(ApiResponse<List<InventoryResponse>>.Ok(items,"Retrieved inventories succesfully.", 200));
         }
 
         [HttpPost]
         public async Task<IActionResult> AddInventory()
         {
             var items = await _inventoryService.AddInventoryItemAsync(new InventoryRequest());
-            return Ok(ApiResponse<InventoryResponse>.Ok(items));
+            return Ok(ApiResponse<InventoryResponse>.Ok(items, "Added inventory", 201));
         }
 
         [HttpPut("{inventoryId}")]
@@ -51,7 +51,7 @@ namespace dotnet_backend.Controllers
                 return NotFound(ApiResponse<bool>.Fail("Inventory item not found", 404));
             }
 
-            return Ok(ApiResponse<bool>.Ok(true));
+            return Ok(ApiResponse<bool>.Ok("Inventory is deleted"));
         }
 
         [HttpGet("{inventoryId}")]
