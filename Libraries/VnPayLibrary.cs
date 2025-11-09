@@ -31,6 +31,14 @@ namespace dotnet_backend.Libraries
             var vnpSecureHash =
                 collection.FirstOrDefault(k => k.Key == "vnp_SecureHash").Value; //hash của dữ liệu trả về
             var orderInfo = vnPay.GetResponseData("vnp_OrderInfo");
+
+            var amountStr = vnPay.GetResponseData("vnp_Amount");
+            decimal amount = 0;
+            if (decimal.TryParse(amountStr, out var parsed))
+            {
+                amount = parsed / 100;
+            }
+
             var checkSignature =
                 vnPay.ValidateSignature(vnpSecureHash, hashSecret); //check Signature
             if (!checkSignature)
@@ -47,7 +55,8 @@ namespace dotnet_backend.Libraries
                 PaymentId = vnPayTranId.ToString(),
                 TransactionId = vnPayTranId.ToString(),
                 Token = vnpSecureHash,
-                VnPayResponseCode = vnpResponseCode
+                VnPayResponseCode = vnpResponseCode,
+                Amount = amount
             };
         }
 

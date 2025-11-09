@@ -1,5 +1,6 @@
 using dotnet_backend.Data;
 using dotnet_backend.DTOs;
+using dotnet_backend.DTOs.Inventory;
 using dotnet_backend.DTOs.Order;
 using dotnet_backend.Models;
 using dotnet_backend.Services.Interfaces;
@@ -10,10 +11,12 @@ namespace dotnet_backend.Services.Implementations
     public class OrderService : IOrderService
     {
         private readonly StoreDbContext _context;
+        private readonly IInventoryService _inventoryService;
 
-        public OrderService(StoreDbContext context)
+        public OrderService(StoreDbContext context, IInventoryService inventoryService)
         {
             _context = context;
+            _inventoryService = inventoryService;
         }
 
         public async Task<Order> CreateOrderAsync(CreateOrderRequest request)
@@ -66,11 +69,14 @@ namespace dotnet_backend.Services.Implementations
                     .FirstOrDefaultAsync(p => p.PromoId == request.PromoId);
                 if (promo!.DiscountType == "percent")
                 {
-                    order.TotalAmount = totalAmount - totalAmount * promo!.DiscountValue / 100;
+                    order.DiscountAmount = totalAmount * promo!.DiscountValue / 100;
+                    order.TotalAmount = totalAmount - order.DiscountAmount;
+                    
                 }
                 else if (promo!.DiscountType == "fixed")
                 {
-                    order.TotalAmount = totalAmount - promo!.DiscountValue;
+                    order.DiscountAmount = promo!.DiscountValue;
+                    order.TotalAmount = totalAmount - order.DiscountAmount;
                 }
 
             }
@@ -85,6 +91,36 @@ namespace dotnet_backend.Services.Implementations
             return order;
         }
 
+        public async Task UpdateOrderStatusAndInventoryAsync(int id)
+        {
+            var order = await GetOrderByIdAsync(id);
+            if (order != null)
+            {
+                order.Status = "paid";
+                foreach (var item in order.OrderItems)
+                {
+                    var product = await _context.Products.FindAsync(item.ProductId);
+                    if (product != null)
+                    {
+                        var inventory = await _context.Inventory.FindAsync(item.ProductId);
+                        if (inventory != null)
+                        {
+                            await _inventoryService.UpdateInventoryItemAsync(
+                                inventory.InventoryId,
+                                new InventoryRequest
+                                {
+                                    ProductId = item.ProductId,
+                                    Quantity = inventory.Quantity - item.Quantity
+                                }
+                            );
+                        }
+                        
+                    }
+                }
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<Order?> GetOrderByIdAsync(int orderId)
         {
             return await _context.Orders
@@ -93,7 +129,7 @@ namespace dotnet_backend.Services.Implementations
                 .Include(o => o.Promotion)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
-                .Include(o => o.Payments)
+                .Include(o => o.Payment)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId);
         }
 
@@ -104,7 +140,7 @@ namespace dotnet_backend.Services.Implementations
                 .Include(o => o.User)
                 .Include(o => o.Promotion)
                 .Include(o => o.OrderItems)
-                .Include(o => o.Payments)
+                .Include(o => o.Payment)
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }

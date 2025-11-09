@@ -44,6 +44,9 @@ namespace dotnet_backend.Data{
             modelBuilder.Entity<Payment>()
                 .Property(p => p.PaymentMethod)
                 .HasConversion<string>();
+       
+
+            
         }
     }
 }
