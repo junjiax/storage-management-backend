@@ -34,7 +34,13 @@ namespace dotnet_backend.Models
         [Column("unit")]
         public string Unit { get; set; } = "pcs";
 
-        [Column("created_at")]
+      [Column("product_img")]
+      public string ProductImg { get; set; } = string.Empty;
+
+      [Column("product_public_id")]
+      public string? ProductPublicId { get; set; }
+
+      [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation properties

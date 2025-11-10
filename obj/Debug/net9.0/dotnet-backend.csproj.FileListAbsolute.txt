@@ -97,6 +97,7 @@ D:\dotnet_be\bin\Debug\net9.0\dotnet-backend.dll
 D:\dotnet_be\bin\Debug\net9.0\dotnet-backend.pdb
 D:\dotnet_be\bin\Debug\net9.0\Azure.Core.dll
 D:\dotnet_be\bin\Debug\net9.0\Azure.Identity.dll
+D:\dotnet_be\bin\Debug\net9.0\CloudinaryDotNet.dll
 D:\dotnet_be\bin\Debug\net9.0\Humanizer.dll
 D:\dotnet_be\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\dotnet_be\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
@@ -137,6 +138,7 @@ D:\dotnet_be\bin\Debug\net9.0\Microsoft.SqlServer.Server.dll
 D:\dotnet_be\bin\Debug\net9.0\Microsoft.Win32.SystemEvents.dll
 D:\dotnet_be\bin\Debug\net9.0\Mono.TextTemplating.dll
 D:\dotnet_be\bin\Debug\net9.0\MySqlConnector.dll
+D:\dotnet_be\bin\Debug\net9.0\Newtonsoft.Json.dll
 D:\dotnet_be\bin\Debug\net9.0\Pomelo.EntityFrameworkCore.MySql.dll
 D:\dotnet_be\bin\Debug\net9.0\System.ClientModel.dll
 D:\dotnet_be\bin\Debug\net9.0\System.CodeDom.dll
@@ -249,7 +251,6 @@ D:\dotnet_be\obj\Debug\net9.0\staticwebassets.build.json
 D:\dotnet_be\obj\Debug\net9.0\staticwebassets.build.json.cache
 D:\dotnet_be\obj\Debug\net9.0\staticwebassets.development.json
 D:\dotnet_be\obj\Debug\net9.0\staticwebassets.build.endpoints.json
-D:\dotnet_be\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 D:\dotnet_be\obj\Debug\net9.0\dotnet-b.09BEDAB1.Up2Date
 D:\dotnet_be\obj\Debug\net9.0\dotnet-backend.dll
 D:\dotnet_be\obj\Debug\net9.0\refint\dotnet-backend.dll

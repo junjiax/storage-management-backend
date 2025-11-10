@@ -1,3 +1,4 @@
+﻿using dotnet_backend.DTOs.Common;
 using dotnet_backend.DTOs.Product;
 using dotnet_backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -62,5 +63,66 @@ namespace dotnet_backend.Controllers
             }
             return NoContent();
         }
-    }
+
+
+
+      [HttpPost("upload")]
+      public async Task<ActionResult<ApiResponse<ProductResponse>>> AddProductWithUpload(
+[FromForm] ProductWithUploadImgRequest request) // <-- Dùng [FromForm]
+      {
+         if (!ModelState.IsValid)
+         {
+            return BadRequest(ApiResponse<ProductResponse>.Fail("Invalid data", 400));
+         }
+
+         try
+         {
+            // Gọi hàm service xử lý upload
+            var product = await _productService.AddProductItemWithImageAsync(request);
+
+            return CreatedAtAction(
+                nameof(GetProductById),
+                new { productId = product.ProductId },
+                ApiResponse<ProductResponse>.Ok(
+                    data: product,
+                    message: "Product added successfully (with image)"
+                )
+            );
+         }
+         catch (Exception ex)
+         {
+            return StatusCode(500, ApiResponse<ProductResponse>.Fail($"Internal server error: {ex.Message}", 500));
+         }
+      }
+
+      [HttpPut("{productId}/upload")]
+      public async Task<ActionResult<ApiResponse<ProductResponse>>> UpdateProductWithUpload(
+          int productId,
+          [FromForm] ProductWithUploadImgRequest request) // <-- Dùng [FromForm]
+      {
+         if (!ModelState.IsValid)
+         {
+            return BadRequest(ApiResponse<ProductResponse>.Fail("Invalid data", 400));
+         }
+
+         try
+         {
+            // Gọi hàm service xử lý upload và xóa ảnh cũ
+            var updatedProduct = await _productService.UpdateProductItemWithImageAsync(productId, request);
+
+            return Ok(ApiResponse<ProductResponse>.Ok(
+                data: updatedProduct,
+                message: "Product updated successfully (with image)"
+            ));
+         }
+         catch (KeyNotFoundException ex) // Bắt lỗi 404
+         {
+            return NotFound(ApiResponse<ProductResponse>.Fail(ex.Message, 404));
+         }
+         catch (Exception ex) // Bắt lỗi 500
+         {
+            return StatusCode(500, ApiResponse<ProductResponse>.Fail($"Internal server error: {ex.Message}", 500));
+         }
+      }
+   }
 }

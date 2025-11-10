@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using dotnet_backend.Data;
+using dotnet_backend.Libraries;
 using dotnet_backend.Repositories;
 using dotnet_backend.Services;
 using dotnet_backend.Services.Implementations;
@@ -35,6 +36,10 @@ builder.Services.AddDbContext<StoreDbContext>(options =>
 	)
 );
 
+//CloudinarySettings
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+
+
 // Application services
 builder.Services.AddScoped<dotnet_backend.Repositories.IUserRepository, dotnet_backend.Repositories.UserRepository>();
 builder.Services.AddScoped<dotnet_backend.Interfaces.IVnPayService, dotnet_backend.Services.VnPayService>();
@@ -47,6 +52,7 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 // Đăng ký Repository
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 
