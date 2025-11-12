@@ -9,5 +9,7 @@ namespace dotnet_backend.Services.Interfaces
         Task<Order?> GetOrderByIdAsync(int id);
         Task<List<Order>> GetAllOrdersAsync();
         Task UpdateOrderStatusAndInventoryAsync(int id);
-    }
+        Task<byte[]> ExportOrderToPdfAsync(int id);
+
+    }   
 }

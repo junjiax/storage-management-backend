@@ -190,5 +190,27 @@ namespace dotnet_backend.Controllers
                 }
             };
         }
+        
+        [HttpGet("{id:int}/export-pdf")]
+        public async Task<IActionResult> ExportOrderToPdf(int id)
+        {
+            try
+            {
+                var pdfBytes = await _orderService.ExportOrderToPdfAsync(id);
+                // 🔹 Trả file trực tiếp, không wrap trong ApiResponse
+                return File(pdfBytes, "application/pdf", $"Order_{id}.pdf");
+            }
+            catch (ArgumentException ex)
+            {
+                // 🔹 Trả NotFound trực tiếp
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // 🔹 Trả 500 trực tiếp
+                return StatusCode(500, new { message = "Failed to generate PDF", detail = ex.Message });
+            }
+        }
+
     }
 }
