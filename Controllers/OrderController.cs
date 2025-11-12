@@ -81,7 +81,7 @@ namespace dotnet_backend.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateOrderStatusAndInventory(int id)
+        public async Task<IActionResult> a(int id)
         {
             try
             {

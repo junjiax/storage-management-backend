@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using dotnet_backend.Data;           
-using dotnet_backend.DTOs.Promotion;  
+using dotnet_backend.Data;
+using dotnet_backend.DTOs.Promotion;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using dotnet_backend.Models; 
+using dotnet_backend.Models;
 
 
 namespace dotnet_backend.Services
@@ -19,7 +19,7 @@ namespace dotnet_backend.Services
         }
 
         // Lấy danh sách tất cả khuyến mãi
-       public async Task<List<PromotionResponse>> GetPromotionListAsync()
+        public async Task<List<PromotionResponse>> GetPromotionListAsync()
         {
             var promotions = await _context.Promotions.ToListAsync();
             var now = DateTime.UtcNow;
@@ -40,11 +40,8 @@ namespace dotnet_backend.Services
                     _context.Promotions.Update(p);
                 }
             }
-            await _context.SaveChangesAsync();
 
-            // Nếu muốn lưu lại trạng thái mới vào DB, uncomment:
-            // _context.Promotions.UpdateRange(promotions);
-            // await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return promotions.Select(p => new PromotionResponse
             {
@@ -60,6 +57,34 @@ namespace dotnet_backend.Services
                 UsedCount = p.UsedCount,
                 Status = p.Status
             }).ToList();
+        }
+
+        public async Task<List<PromotionResponse>?> GetPromotionsWithMinOrderAmountGreaterThanAsync(decimal minOrderAmount)
+        {
+            var now = DateTime.UtcNow;
+
+            var promotions = await _context.Promotions
+                .Where(p => p.MinOrderAmount <= minOrderAmount
+                            && p.EndDate >= now
+                            && p.Status == "active")
+                .ToListAsync();
+
+            var promotionResponses = promotions.Select(p => new PromotionResponse
+            {
+                PromoId = p.PromoId,
+                PromoCode = p.PromoCode,
+                Description = p.Description,
+                DiscountType = p.DiscountType,
+                DiscountValue = p.DiscountValue,
+                StartDate = p.StartDate,
+                EndDate = p.EndDate,
+                MinOrderAmount = p.MinOrderAmount,
+                UsageLimit = p.UsageLimit,
+                UsedCount = p.UsedCount,
+                Status = p.Status
+            }).ToList();
+
+            return promotionResponses;
         }
 
         // Lấy chi tiết khuyến mãi theo ID

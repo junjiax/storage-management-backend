@@ -16,7 +16,7 @@ namespace dotnet_backend.Controllers
             _promotionService = promotionService;
         }
 
-        // 🔹 Lấy danh sách tất cả khuyến mãi
+        // Lấy danh sách tất cả khuyến mãi
         [HttpGet]
         public async Task<ActionResult<ApiResponse<List<PromotionResponse>>>> GetPromotions()
         {
@@ -27,7 +27,20 @@ namespace dotnet_backend.Controllers
             ));
         }
 
-        // 🔹 Lấy chi tiết khuyến mãi theo ID
+        [HttpGet("min-order/{minOrderAmount}")]
+        public async Task<IActionResult> GetPromotionsWithMinOrderAmountGreaterThanAsync(decimal minOrderAmount)
+        {
+            var response = await _promotionService.GetPromotionsWithMinOrderAmountGreaterThanAsync(minOrderAmount);
+            if (response == null)
+                return NotFound(ApiResponse<string>.Fail(
+                    "Promotion not found",
+                    statusCode: 404
+                ));
+
+            return Ok(ApiResponse<object>.Ok(data: response, message: "Get successfully"));
+        }
+
+        // Lấy chi tiết khuyến mãi theo ID
         [HttpGet("{promotionId}")]
         public async Task<ActionResult<ApiResponse<PromotionResponse>>> GetPromotionById(int promotionId)
         {
@@ -46,7 +59,7 @@ namespace dotnet_backend.Controllers
             ));
         }
 
-        // 🔹 Thêm khuyến mãi mới
+        // Thêm khuyến mãi mới
         [HttpPost]
         public async Task<ActionResult<ApiResponse<PromotionResponse>>> AddPromotion([FromBody] CreatePromotionRequest request)
         {
@@ -62,7 +75,7 @@ namespace dotnet_backend.Controllers
             );
         }
 
-        // 🔹 Cập nhật khuyến mãi
+        // Cập nhật khuyến mãi
         [HttpPut("{promotionId}")]
         public async Task<ActionResult<ApiResponse<PromotionResponse>>> UpdatePromotion(int promotionId, [FromBody] UpdatePromotionRequest request)
         {
@@ -82,7 +95,7 @@ namespace dotnet_backend.Controllers
             ));
         }
 
-        // 🔹 Xóa khuyến mãi
+        // Xóa khuyến mãi
         [HttpDelete("{promotionId}")]
         public async Task<ActionResult<ApiResponse<bool>>> DeletePromotion(int promotionId)
         {
