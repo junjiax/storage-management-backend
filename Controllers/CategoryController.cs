@@ -1,8 +1,10 @@
 using dotnet_backend.DTOs.Category;
+using dotnet_backend.DTOs.Common;
 using dotnet_backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 namespace dotnet_backend.Controllers
 
 {
@@ -21,7 +23,7 @@ namespace dotnet_backend.Controllers
         public async Task<ActionResult<List<CategoryResponse>>> GetCategories()
         {
             var categories = await _categoryService.GetCategoryListAsync();
-            return Ok(categories);
+            return Ok(ApiResponse<IEnumerable<CategoryResponse>>.Ok(categories));
         }
 
         [HttpGet("{categoryId}")]
@@ -32,14 +34,14 @@ namespace dotnet_backend.Controllers
             {
                 return NotFound();
             }
-            return Ok(category);
+            return Ok(ApiResponse<CategoryResponse>.Ok(category));
         }
 
         [HttpPost]
         public async Task<ActionResult<CategoryResponse>> AddCategory([FromBody] CategoryRequest request)
         {
             var category = await _categoryService.AddCategoryItemAsync(request);
-            return CreatedAtAction(nameof(GetCategoryById), new { categoryId = category.CategoryId }, category);
+            return CreatedAtAction(nameof(GetCategoryById), new { categoryId = category.CategoryId }, ApiResponse<CategoryResponse>.Ok(category, "Created category.", 201));
         }
 
         [HttpPut("{categoryId}")]
@@ -50,7 +52,7 @@ namespace dotnet_backend.Controllers
             {
                 return NotFound();
             }
-            return Ok(updatedCategory);
+            return Ok(ApiResponse<CategoryResponse>.Ok(updatedCategory,"Updated category."));
         }
 
         [HttpDelete("{categoryId}")]
@@ -61,7 +63,7 @@ namespace dotnet_backend.Controllers
             {
                 return NotFound();
             }
-            return NoContent();
+            return Ok(ApiResponse.Ok("Category is deleted."));
         }
     }
 }
