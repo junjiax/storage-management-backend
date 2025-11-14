@@ -1,14 +1,17 @@
 using dotnet_backend.Data;
-using dotnet_backend.DTOs;
 using dotnet_backend.DTOs.Inventory;
 using dotnet_backend.DTOs.Order;
 using dotnet_backend.Models;
 using dotnet_backend.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
-using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using QuestPDF.Drawing;
+using MimeKit;
+using MailKit.Security;
+using MailKit.Net.Smtp;
+using System.ComponentModel.DataAnnotations;
+using dotnet_backend.DTOs.Common;
+
 
 
 namespace dotnet_backend.Services.Implementations
@@ -150,12 +153,20 @@ namespace dotnet_backend.Services.Implementations
                 .ToListAsync();
         }
 
-        public async Task<byte[]> ExportOrderToPdfAsync(int id)
+        public async Task<ApiResponse<byte[]>> ExportOrderToPdfAsync(int id)
         {
             QuestPDF.Settings.License = LicenseType.Community;
             var order = await GetOrderByIdAsync(id);
             if (order == null)
-                throw new ArgumentException($"Order with id {id} not found.");
+                return ApiResponse<byte[]>.Fail($"Order with id {id} not found.", 404);
+
+            var email = order.Customer?.Email;
+            if (string.IsNullOrWhiteSpace(email))
+                return ApiResponse<byte[]>.Fail("Customer does not have an email.", 400);
+
+            var emailValidator = new EmailAddressAttribute();
+            if (!emailValidator.IsValid(email))
+                return ApiResponse<byte[]>.Fail("Customer email format is invalid.", 400);
 
             var document = Document.Create(container =>
             {
@@ -253,9 +264,56 @@ namespace dotnet_backend.Services.Implementations
                 });
             });
 
-            // Xuất file ra mảng byte để controller trả về
-            var pdfBytes = document.GeneratePdf();
-            return pdfBytes;
+            byte[] pdfBytes = document.GeneratePdf();
+            return ApiResponse<byte[]>.Ok(pdfBytes);
         }
+
+        public async Task<ApiResponse<string>> SendInvoiceEmailAsync(byte[] pdfBytes, int orderId)
+        {
+            try
+            {
+                var order = await GetOrderByIdAsync(orderId);
+                if (order == null)
+                    return ApiResponse<string>.Fail($"Order with id {orderId} not found.", 404);
+
+                if (string.IsNullOrWhiteSpace(order.Customer?.Email))
+                    return ApiResponse<string>.Fail("Customer does not have an email.", 400);
+
+                var email = new MimeMessage();
+                email.From.Add(new MailboxAddress("Cửa hàng bán lẻ", "xvideosdm@gmail.com"));
+                email.To.Add(new MailboxAddress("", order.Customer.Email));
+                email.Subject = $"Hóa đơn đơn hàng #{orderId}";
+
+                var builder = new BodyBuilder
+                {
+                    TextBody = "Cảm ơn bạn đã mua hàng. Hóa đơn nằm trong file đính kèm."
+                };
+
+                builder.Attachments.Add($"HoaDon_{orderId}.pdf", pdfBytes, new ContentType("application", "pdf"));
+                email.Body = builder.ToMessageBody();
+
+                using var smtp = new SmtpClient();
+                await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+                await smtp.AuthenticateAsync("xvideosdm@gmail.com", "obtv ofxj pejf mubo");
+                await smtp.SendAsync(email);
+                await smtp.DisconnectAsync(true);
+
+                return ApiResponse<string>.Ok($"Invoice #{orderId} has been sent to customer email.");
+            }
+            catch (SmtpCommandException ex)
+            {
+                return ApiResponse<string>.Fail($"SMTP lỗi: {ex.Message}", 500);
+            }
+            catch (SmtpProtocolException ex)
+            {
+                return ApiResponse<string>.Fail($"Lỗi giao thức SMTP: {ex.Message}", 500);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.Fail($"Gửi email thất bại: {ex.Message}", 500);
+            }
+        }
+
+
     }
 }

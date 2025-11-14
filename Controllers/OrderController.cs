@@ -81,7 +81,7 @@ namespace dotnet_backend.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> a(int id)
+        public async Task<IActionResult> UpdateOrderStatusAndInventory(int id)
         {
             try
             {
@@ -95,9 +95,9 @@ namespace dotnet_backend.Controllers
             catch (ArgumentException ex)
             {
                 var errors = new Dictionary<string, string[]>
-        {
-            { "order", new[] { ex.Message } }
-        };
+                {
+                    { "order", new[] { ex.Message } }
+                };
 
                 return BadRequest(ApiResponse<string>.Fail(
                     message: "Invalid order data",
@@ -108,9 +108,9 @@ namespace dotnet_backend.Controllers
             catch (Exception ex)
             {
                 var errors = new Dictionary<string, string[]>
-        {
-            { "exception", new[] { ex.Message } }
-        };
+                {
+                    { "exception", new[] { ex.Message } }
+                };
 
                 return StatusCode(500, ApiResponse<string>.Fail(
                     message: "Internal server error",
@@ -155,6 +155,42 @@ namespace dotnet_backend.Controllers
             ));
         }
 
+        [HttpGet("{id:int}/export-pdf")]
+        public async Task<IActionResult> ExportOrderToPdf(int id)
+        {
+            var pdfRes = await _orderService.ExportOrderToPdfAsync(id);
+
+            if (!pdfRes.Success)
+            {
+                return StatusCode(pdfRes.StatusCode, pdfRes);
+            }
+
+            return File(pdfRes.Data!, "application/pdf", $"Order_{id}.pdf");
+        }
+
+
+        [HttpPost("{id:int}/send-pdf")]
+        public async Task<IActionResult> ExportOrderToPdfAndSendToEmail(int id)
+        {
+            var pdfRes = await _orderService.ExportOrderToPdfAsync(id);
+
+            if (!pdfRes.Success)
+            {
+                return StatusCode(pdfRes.StatusCode, pdfRes);
+            }
+
+            var emailRes = await _orderService.SendInvoiceEmailAsync(pdfRes.Data!, id);
+            if (!emailRes.Success)
+            {
+                return StatusCode(emailRes.StatusCode, emailRes);
+            }
+
+            return Ok(ApiResponse<string>.Ok(
+                data: $"Invoice #{id} has been sent to customer email.",
+                message: "Invoice was sent."
+            ));
+        }
+
         private static OrderResponse MapOrderToResponse(dotnet_backend.Models.Order order)
         {
             return new OrderResponse
@@ -190,27 +226,5 @@ namespace dotnet_backend.Controllers
                 }
             };
         }
-        
-        [HttpGet("{id:int}/export-pdf")]
-        public async Task<IActionResult> ExportOrderToPdf(int id)
-        {
-            try
-            {
-                var pdfBytes = await _orderService.ExportOrderToPdfAsync(id);
-                // 🔹 Trả file trực tiếp, không wrap trong ApiResponse
-                return File(pdfBytes, "application/pdf", $"Order_{id}.pdf");
-            }
-            catch (ArgumentException ex)
-            {
-                // 🔹 Trả NotFound trực tiếp
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                // 🔹 Trả 500 trực tiếp
-                return StatusCode(500, new { message = "Failed to generate PDF", detail = ex.Message });
-            }
-        }
-
     }
 }
