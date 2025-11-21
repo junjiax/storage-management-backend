@@ -1,5 +1,3 @@
-
-
 using dotnet_backend.DTOs.Common;
 using dotnet_backend.DTOs.Order;
 using dotnet_backend.Services.Interfaces;
@@ -95,9 +93,9 @@ namespace dotnet_backend.Controllers
             catch (ArgumentException ex)
             {
                 var errors = new Dictionary<string, string[]>
-        {
-            { "order", new[] { ex.Message } }
-        };
+                {
+                    { "order", new[] { ex.Message } }
+                };
 
                 return BadRequest(ApiResponse<string>.Fail(
                     message: "Invalid order data",
@@ -108,9 +106,9 @@ namespace dotnet_backend.Controllers
             catch (Exception ex)
             {
                 var errors = new Dictionary<string, string[]>
-        {
-            { "exception", new[] { ex.Message } }
-        };
+                {
+                    { "exception", new[] { ex.Message } }
+                };
 
                 return StatusCode(500, ApiResponse<string>.Fail(
                     message: "Internal server error",
@@ -152,6 +150,42 @@ namespace dotnet_backend.Controllers
             return Ok(ApiResponse<List<OrderResponse>>.Ok(
                 data: response,
                 message: "Orders retrieved successfully"
+            ));
+        }
+
+        [HttpGet("{id:int}/export-pdf")]
+        public async Task<IActionResult> ExportOrderToPdf(int id)
+        {
+            var pdfRes = await _orderService.ExportOrderToPdfAsync(id);
+
+            if (!pdfRes.Success)
+            {
+                return StatusCode(pdfRes.StatusCode, pdfRes);
+            }
+
+            return File(pdfRes.Data!, "application/pdf", $"Order_{id}.pdf");
+        }
+
+
+        [HttpPost("{id:int}/send-pdf")]
+        public async Task<IActionResult> ExportOrderToPdfAndSendToEmail(int id)
+        {
+            var pdfRes = await _orderService.ExportOrderToPdfAsync(id);
+
+            if (!pdfRes.Success)
+            {
+                return StatusCode(pdfRes.StatusCode, pdfRes);
+            }
+
+            var emailRes = await _orderService.SendInvoiceEmailAsync(pdfRes.Data!, id);
+            if (!emailRes.Success)
+            {
+                return StatusCode(emailRes.StatusCode, emailRes);
+            }
+
+            return Ok(ApiResponse<string>.Ok(
+                data: $"Invoice #{id} has been sent to customer email.",
+                message: "Invoice was sent."
             ));
         }
 
