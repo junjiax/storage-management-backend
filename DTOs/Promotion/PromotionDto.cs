@@ -27,9 +27,6 @@ namespace dotnet_backend.DTOs.Promotion
 
         [JsonPropertyName("usageLimit")]
         public int UsageLimit { get; set; }
-        
-        [JsonPropertyName("status")]
-        public string Status { get; set; } = "active"; // <--- Thêm property này
     }
 
     public class UpdatePromotionRequest
@@ -39,10 +36,6 @@ namespace dotnet_backend.DTOs.Promotion
 
         [JsonPropertyName("discountValue")]
         public decimal? DiscountValue { get; set; }
-        [JsonPropertyName("discountType")]
-        public string? DiscountType { get; set; } // <--- Thêm nếu muốn update loại giảm
-        [JsonPropertyName("startDate")]
-        public DateTime? StartDate { get; set; } // <--- Thêm nếu muốn update ngày bắt đầu
 
         [JsonPropertyName("endDate")]
         public DateTime? EndDate { get; set; }

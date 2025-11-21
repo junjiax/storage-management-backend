@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace dotnet_backend.DTOs.Product
 {
@@ -73,10 +73,36 @@ namespace dotnet_backend.DTOs.Product
         [JsonPropertyName("unit")]
         public string Unit { get; set; } = string.Empty;
 
-        [JsonPropertyName("createdAt")]
+
+      // (THÊM DÒNG NÀY)
+      [JsonPropertyName("productImg")]
+      public string? ProductImg { get; set; } // <-- Thêm trường ảnh
+
+
+
+
+      [JsonPropertyName("createdAt")]
         public DateTime CreatedAt { get; set; }
 
         [JsonPropertyName("currentStock")]
         public int? CurrentStock { get; set; }
     }
+
+
+   public class ProductWithUploadImgRequest
+   {
+      public int? CategoryId { get; set; }
+
+      public int? SupplierId { get; set; }
+
+      public string ProductName { get; set; } = string.Empty;
+
+      public string? Barcode { get; set; }
+
+      public decimal Price { get; set; }
+
+      public string Unit { get; set; } = "pcs";
+
+      public IFormFile? ImageFile { get; set; }
+   }
 }

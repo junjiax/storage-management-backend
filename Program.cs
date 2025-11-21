@@ -1,11 +1,13 @@
+﻿using System.Text;
 using dotnet_backend.Data;
+using dotnet_backend.Libraries;
+using dotnet_backend.Repositories;
 using dotnet_backend.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using dotnet_backend.Services.Interfaces;
 using dotnet_backend.Services.Implementations;
+using dotnet_backend.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +36,10 @@ builder.Services.AddDbContext<StoreDbContext>(options =>
 	)
 );
 
+//CloudinarySettings
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+
+
 // Application services
 builder.Services.AddScoped<dotnet_backend.Repositories.IUserRepository, dotnet_backend.Repositories.UserRepository>();
 builder.Services.AddScoped<dotnet_backend.Interfaces.IVnPayService, dotnet_backend.Services.VnPayService>();
@@ -46,8 +52,11 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 
-builder.Services.AddScoped<IPromotionService, PromotionService>();
-builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
+// Đăng ký Repository
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
+
 
 // JWT Authentication
 var jwtSection = builder.Configuration.GetSection("Jwt");
