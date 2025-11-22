@@ -1,4 +1,4 @@
-﻿using dotnet_backend.Data;
+﻿﻿using dotnet_backend.Data;
 using dotnet_backend.DTOs.Report;
 using dotnet_backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -85,18 +85,18 @@ namespace dotnet_backend.Repositories
             }
 
             // Lọc theo ngày Payment của Order
-            if (request.StartDate.HasValue)
-            {
-               itemQuery = itemQuery.Where(item =>
-                   item.Order.Payments.Any(p => p.PaymentDate >= request.StartDate.Value)
-               );
-            }
-            if (request.EndDate.HasValue)
-            {
-               itemQuery = itemQuery.Where(item =>
-                   item.Order.Payments.Any(p => p.PaymentDate < request.EndDate.Value.AddDays(1))
-               );
-            }
+            // if (request.StartDate.HasValue)
+            // {
+            //    itemQuery = itemQuery.Where(item =>
+            //        item.Order.Payments.Any(p => p.PaymentDate >= request.StartDate.Value)
+            //    );
+            // }
+            // if (request.EndDate.HasValue)
+            // {
+            //    itemQuery = itemQuery.Where(item =>
+            //        item.Order.Payments.Any(p => p.PaymentDate < request.EndDate.Value.AddDays(1))
+            //    );
+            // }
 
             // Tính tổng Subtotal của CHỈ các item đã lọc
             totalRevenue = await itemQuery.SumAsync(item => item.Subtotal);
