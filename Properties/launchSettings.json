@@ -6,18 +6,20 @@
       "dotnetRunMessages": true,
       "launchBrowser": false,
       "applicationUrl": "http://localhost:5247",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "environmentVariables": {
+            "ASPNETCORE_ENVIRONMENT": "Development",
+            "Jwt__Key": "dd95feb9440ac21d04850b57abc547e2fe6ed9d57245b01a6680ae9cfe046676"
+        }
     },
     "https": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
       "applicationUrl": "https://localhost:7145;http://localhost:5247",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "environmentVariables": {
+            "ASPNETCORE_ENVIRONMENT": "Development",
+            "Jwt__Key": "dd95feb9440ac21d04850b57abc547e2fe6ed9d57245b01a6680ae9cfe046676"
+        }
     }
   }
 }
