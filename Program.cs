@@ -14,16 +14,18 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddControllers();
+
 // CORS for frontend on port 5173 (Vite)
 builder.Services.AddCors(options =>
 {
-	options.AddPolicy("AllowVite", policy =>
-	{
-		policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173")
-			.AllowAnyHeader()
-			.AllowAnyMethod()
-			.AllowCredentials();
-	});
+    options.AddPolicy("DevAll", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "https://localhost:5174")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
 });
 
 // Add services to the container.
@@ -85,13 +87,19 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
-app.UseCors("AllowVite");
+app.UseCors("DevAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers(); // Controller API
 app.MapControllerRoute(
-	name: "default",
-	pattern: "{controller=Home}/{action=Index}"
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}"
 );
+
+app.MapOpenApi();
 
 app.Run();
