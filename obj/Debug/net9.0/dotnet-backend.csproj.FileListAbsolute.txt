@@ -251,6 +251,7 @@ D:\dotnet_be\obj\Debug\net9.0\staticwebassets.build.json
 D:\dotnet_be\obj\Debug\net9.0\staticwebassets.build.json.cache
 D:\dotnet_be\obj\Debug\net9.0\staticwebassets.development.json
 D:\dotnet_be\obj\Debug\net9.0\staticwebassets.build.endpoints.json
+D:\dotnet_be\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 D:\dotnet_be\obj\Debug\net9.0\dotnet-b.09BEDAB1.Up2Date
 D:\dotnet_be\obj\Debug\net9.0\dotnet-backend.dll
 D:\dotnet_be\obj\Debug\net9.0\refint\dotnet-backend.dll

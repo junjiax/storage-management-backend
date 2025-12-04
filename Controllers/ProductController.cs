@@ -11,8 +11,8 @@ namespace dotnet_backend.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
-
-        public ProductController(IProductService productService)
+      private const long MAX_FILE_SIZE = 5242880;
+      public ProductController(IProductService productService)
         {
             _productService = productService;
         }
@@ -70,6 +70,19 @@ namespace dotnet_backend.Controllers
       public async Task<ActionResult<ApiResponse<ProductResponse>>> AddProductWithUpload(
 [FromForm] ProductWithUploadImgRequest request) // <-- Dùng [FromForm]
       {
+         if (request.ImageFile != null)
+         {
+            if (request.ImageFile.Length == 0)
+            {
+               return BadRequest(ApiResponse<ProductResponse>.Fail("Image file is empty", 400));
+            }
+
+            if (request.ImageFile.Length > MAX_FILE_SIZE)
+            {
+               return BadRequest(ApiResponse<ProductResponse>.Fail("Image file size exceeds 5 MB", 400));
+            }
+         }
+
          if (!ModelState.IsValid)
          {
             return BadRequest(ApiResponse<ProductResponse>.Fail("Invalid data", 400));
@@ -100,6 +113,19 @@ namespace dotnet_backend.Controllers
           int productId,
           [FromForm] ProductWithUploadImgRequest request) // <-- Dùng [FromForm]
       {
+         if (request.ImageFile != null)
+         {
+            if (request.ImageFile.Length == 0)
+            {
+               return BadRequest(ApiResponse<ProductResponse>.Fail("Image file is empty", 400));
+            }
+
+            if (request.ImageFile.Length > MAX_FILE_SIZE)
+            {
+               return BadRequest(ApiResponse<ProductResponse>.Fail("Image file size exceeds 5 MB", 400));
+            }
+         }
+
          if (!ModelState.IsValid)
          {
             return BadRequest(ApiResponse<ProductResponse>.Fail("Invalid data", 400));

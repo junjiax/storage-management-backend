@@ -28,7 +28,7 @@ namespace dotnet_backend.Services
                     CategoryName = p.Category != null ? p.Category.CategoryName : string.Empty,
                     SupplierId = p.SupplierId,
                     Barcode = p.Barcode,
-                    Unit = p.Unit
+                    Unit = p.Unit,
                 })
                 .ToListAsync();
 
@@ -130,7 +130,8 @@ namespace dotnet_backend.Services
                 SupplierId = product.SupplierId,
                 Barcode = product.Barcode,
                 Price = product.Price,
-                Unit = product.Unit
+                Unit = product.Unit,
+                ProductImg = product.ProductImg
             };
         }
 
@@ -215,11 +216,12 @@ namespace dotnet_backend.Services
             string newPublicId = $"products/{product.ProductId}/{Guid.NewGuid()}";
             string newImageUrl = await _imageUploadService.UploadImageAsync(request.ImageFile, newPublicId);
 
+            string oldPublicId = product.ProductPublicId;
+
             // 3. Cập nhật thông tin ảnh MỚI vào DB
             product.ProductImg = newImageUrl;
             product.ProductPublicId = newPublicId;
 
-            string oldPublicId = product.ProductPublicId;
             if (!string.IsNullOrEmpty(oldPublicId))
             {
                _ = Task.Run(async () =>
@@ -228,7 +230,7 @@ namespace dotnet_backend.Services
                   {
                      await _imageUploadService.DeleteImageAsync(oldPublicId);
                   }
-                  catch (Exception ex)
+                  catch (Exception)
                   {
                      // Ghi log lỗi lại
                      // _logger.LogWarning(ex, "Lỗi xóa ảnh nền Cloudinary");

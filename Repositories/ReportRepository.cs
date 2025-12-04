@@ -225,6 +225,140 @@ namespace dotnet_backend.Repositories
             TotalPromotionsUsed = usedPromoTask
          };
       }
+
+      public async Task<SimpleReportResponse> GetSimpleReportAsync(SimpleReportRequest request)
+      {
+         // === 1. ĐỊNH NGHĨA KỲ BÁO CÁO ===
+         DateTime? currentStartDate = request.StartDate;
+         DateTime? currentEndDateExclusive = request.EndDate?.AddDays(1);
+         DateTime? prevStartDate = null;
+         DateTime? prevEndDateExclusive = null;
+         decimal totalPrevRevenue = 0;
+
+         if (currentStartDate.HasValue && currentEndDateExclusive.HasValue)
+         {
+            var duration = currentEndDateExclusive.Value - currentStartDate.Value;
+            prevEndDateExclusive = currentStartDate;
+            prevStartDate = currentStartDate.Value.Add(-duration);
+         }
+
+         // === 2. TẠO QUERY KỲ NÀY ===
+         IQueryable<Order> currentOrdersQuery = _context.Orders;
+         if (currentStartDate.HasValue)
+         {
+            currentOrdersQuery = currentOrdersQuery.Where(o => o.OrderDate >= currentStartDate.Value);
+         }
+         if (currentEndDateExclusive.HasValue)
+         {
+            currentOrdersQuery = currentOrdersQuery.Where(o => o.OrderDate < currentEndDateExclusive.Value);
+         }
+
+         // === 3. TÍNH TOÁN KỲ NÀY (Chạy tuần tự, an toàn) ===
+
+         // Await ngay lập tức
+         decimal totalRevenue = await currentOrdersQuery.SumAsync(o => o.TotalAmount);
+
+         // Await ngay lập tức
+         int totalOrders = await currentOrdersQuery.CountAsync();
+
+         // Lấy danh sách Customer ID (đã thực thi)
+         var customerIdsInPeriod = await currentOrdersQuery
+                                         .Where(o => o.CustomerId != null)
+                                         .Select(o => o.CustomerId.Value)
+                                         .Distinct()
+                                         .ToListAsync(); // <-- Dùng ToListAsync()
+
+         // === 4. TÍNH TOÁN KỲ TRƯỚC ===
+         if (prevStartDate.HasValue)
+         {
+            IQueryable<Order> prevOrdersQuery = _context.Orders
+                .Where(o =>
+                    o.OrderDate >= prevStartDate.Value &&
+                    o.OrderDate < prevEndDateExclusive.Value);
+
+            // Await ngay lập tức
+            totalPrevRevenue = await prevOrdersQuery.SumAsync(o => o.TotalAmount);
+         }
+
+         // === 5. TÍNH KHÁCH HÀNG MỚI ===
+         int newCustomers = 0;
+         if (currentStartDate.HasValue && customerIdsInPeriod.Any()) // Kiểm tra nếu có KH
+         {
+            // customerIdsInPeriod giờ là List<int>, không còn là IQueryable
+            var firstOrderDates = _context.Orders
+                .Where(o => o.CustomerId != null && customerIdsInPeriod.Contains(o.CustomerId.Value))
+                .GroupBy(o => o.CustomerId.Value)
+                .Select(g => new { FirstOrderDate = g.Min(o => o.OrderDate) });
+
+            // Await ngay lập tức
+            newCustomers = await firstOrderDates
+                .Where(x =>
+                    x.FirstOrderDate >= currentStartDate.Value &&
+                    x.FirstOrderDate < currentEndDateExclusive.Value)
+                .CountAsync();
+         }
+
+         // === 6. TÍNH TĂNG TRƯỞNG ===
+         double growthRate = 0.0;
+         if (totalPrevRevenue > 0)
+         {
+            growthRate = ((double)totalRevenue - (double)totalPrevRevenue) / (double)totalPrevRevenue * 100.0;
+         }
+         else if (totalRevenue > 0)
+         {
+            growthRate = 100.0;
+         }
+
+         // === 7. ĐÓNG GÓI KẾT QUẢ ===
+         return new SimpleReportResponse
+         {
+            TotalRevenue = totalRevenue,
+            TotalOrders = totalOrders,
+            NewCustomers = newCustomers,
+            GrowthRate = Math.Round(growthRate, 2)
+         };
+      }
+
+      public async Task<RevenueByMothResponse> GetRevenueByMonthAsync(RevenueByMothRequest request)
+      {
+         // 1. Lấy tất cả dữ liệu có thật từ CSDL
+         // Bằng cách dùng ToDictionary, chúng ta chỉ truy vấn 1 lần, rất hiệu quả
+         var revenueByMonthDb = await _context.Orders
+             .Where(o => o.OrderDate.Year == request.Year)
+             .GroupBy(o => o.OrderDate.Month) // Nhóm theo số tháng (1, 2, 3...)
+             .Select(g => new MonthlyRevenueData
+             {
+                Month = g.Key,
+                Revenue = g.Sum(o => o.TotalAmount)
+             })
+             .ToDictionaryAsync(r => r.Month); // Chuyển thành { 1: data, 3: data, ... }
+
+         // 2. Tạo danh sách 12 tháng chuẩn (để điền số 0)
+         var fullYearRevenue = new List<MonthlyRevenueData>();
+
+         for (int month = 1; month <= 12; month++)
+         {
+            // 3. Kiểm tra xem tháng 'month' có trong dữ liệu CSDL không
+            if (revenueByMonthDb.TryGetValue(month, out var dataFromDb))
+            {
+               // Nếu có, thêm dữ liệu thật
+               fullYearRevenue.Add(dataFromDb);
+            }
+            else
+            {
+               // Nếu không, thêm dữ liệu với doanh thu = 0
+               fullYearRevenue.Add(new MonthlyRevenueData { Month = month, Revenue = 0 });
+            }
+         }
+
+         // 4. Đóng gói kết quả
+         return new RevenueByMothResponse
+         {
+            Year = request.Year,
+            MonthlyRevenues = fullYearRevenue
+         };
+      }
+
    }
 
 

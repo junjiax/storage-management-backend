@@ -50,5 +50,34 @@ namespace dotnet_backend.Services.Implementations
 
          return await _reportRepository.GetPromotionSimpleReportAsync(request);
       }
+
+      public async Task<SimpleReportResponse> GetSimpleReportAsync(SimpleReportRequest request)
+      {
+         // Xử lý logic nghiệp vụ/validation
+         if (request.StartDate.HasValue && request.EndDate.HasValue && request.StartDate > request.EndDate)
+         {
+            throw new ArgumentException("Ngày bắt đầu không thể sau ngày kết thúc.");
+         }
+
+         // Gọi Repository
+         return await _reportRepository.GetSimpleReportAsync(request);
+      }
+
+      public async Task<RevenueByMothResponse> GetRevenueByMonthAsync(RevenueByMothRequest request)
+      {
+         // --- Xử lý Validation ---
+         int currentYear = DateTime.UtcNow.Year;
+         if (request.Year > currentYear)
+         {
+            throw new ArgumentException($"Năm {request.Year} nằm ở tương lai. Không thể xem báo cáo.");
+         }
+         if (request.Year < 2020) // Ví dụ: Giới hạn năm cũ nhất
+         {
+            throw new ArgumentException("Chỉ hỗ trợ báo cáo từ năm 2020 trở đi.");
+         }
+
+         // --- Gọi Repository ---
+         return await _reportRepository.GetRevenueByMonthAsync(request);
+      }
    }
 }
