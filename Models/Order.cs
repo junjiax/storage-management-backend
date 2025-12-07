@@ -43,6 +43,6 @@ namespace dotnet_backend.Models
         public virtual Promotion? Promotion { get; set; }
 
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-        public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+        public virtual Payment? Payment { get; set; }
     }
 }

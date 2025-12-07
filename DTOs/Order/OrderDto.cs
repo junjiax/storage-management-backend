@@ -24,6 +24,9 @@ namespace dotnet_backend.DTOs.Order
 
         [JsonPropertyName("quantity")]
         public int Quantity { get; set; }
+
+        // [JsonPropertyName("price")]
+        // public decimal Price { get; set; }
     }
 
     public class UpdateOrderStatusRequest
@@ -70,8 +73,8 @@ namespace dotnet_backend.DTOs.Order
         [JsonPropertyName("items")]
         public List<OrderItemResponse> Items { get; set; } = new();
 
-        [JsonPropertyName("payments")]
-        public List<OrderPaymentResponse> Payments { get; set; } = new();
+        [JsonPropertyName("payment")]
+        public OrderPaymentResponse? Payment { get; set; }
     }
 
     public class OrderItemResponse
@@ -104,7 +107,7 @@ namespace dotnet_backend.DTOs.Order
         public decimal Amount { get; set; }
 
         [JsonPropertyName("paymentMethod")]
-        public string PaymentMethod { get; set; } = string.Empty;
+        public string? PaymentMethod { get; set; }
 
         [JsonPropertyName("paymentDate")]
         public DateTime PaymentDate { get; set; }

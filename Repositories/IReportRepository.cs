@@ -13,5 +13,9 @@ namespace dotnet_backend.Repositories
       Task<SimpleReportResponse> GetSimpleReportAsync(SimpleReportRequest request);
 
       Task<RevenueByMothResponse> GetRevenueByMonthAsync(RevenueByMothRequest request);
+
+      Task<OrdersByDayResponse> GetOrdersByDayAsync(OrdersByDayRequest request);
+
+      Task<RatioByCategoryResponse> GetRatioByCategoryAsync(RatioByCategoryRequest request);
    }
 }

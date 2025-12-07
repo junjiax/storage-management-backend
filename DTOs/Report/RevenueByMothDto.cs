@@ -2,12 +2,14 @@
 {
    public class RevenueByMothRequest
    {
-      public int Year { get; set; }
+      public string? StartDate { get; set; }
+      public string? EndDate { get; set; }
    }
    public class MonthlyRevenueData
    {
       public int Month { get; set; }
       public decimal Revenue { get; set; }
+      public int Orders { get; set; }
    }
    public class RevenueByMothResponse
    {

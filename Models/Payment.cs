@@ -20,7 +20,7 @@ namespace dotnet_backend.Models
 
         [Required]
         [Column("payment_method")]
-        public string PaymentMethod { get; set; } = "cash";
+        public string? PaymentMethod { get; set; }
 
         [Required]
         [Column("payment_date")]

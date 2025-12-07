@@ -3,6 +3,7 @@
 using dotnet_backend.DTOs.Common;
 using dotnet_backend.DTOs.Payment;
 using dotnet_backend.Interfaces;
+using dotnet_backend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace dotnet_backend.Controllers
@@ -12,10 +13,15 @@ namespace dotnet_backend.Controllers
     public class PaymentController : ControllerBase
     {
         private readonly IVnPayService _vnPayService;
+        private readonly IOrderService _orderService;
 
-        public PaymentController(IVnPayService vnPayService)
+        private readonly IPaymentService _paymentService;
+
+        public PaymentController(IVnPayService vnPayService, IOrderService orderService, IPaymentService paymentService)
         {
             _vnPayService = vnPayService;
+            _orderService = orderService;
+            _paymentService = paymentService;
         }
 
         // Tạo URL thanh toán
@@ -33,10 +39,24 @@ namespace dotnet_backend.Controllers
 
         // Callback sau khi thanh toán
         [HttpGet("vnpay-callback")]
-        public IActionResult PaymentCallbackVnpay()
+        public async Task<IActionResult> PaymentCallbackVnpay()
         {
             // Convert IQueryCollection to Dictionary
             var response = _vnPayService.PaymentExecute(Request.Query);
+
+            if (response.Success)
+            {
+                await _orderService.UpdateOrderStatusAndInventoryAsync(int.Parse(response.OrderId));
+                var createPaymentRequest = new CreatePaymentRequest
+                {
+                    OrderId = int.Parse(response.OrderId),
+                    Amount = response.Amount,
+                    PaymentMethod = "bank_transfer",
+                };
+
+                await _paymentService.CreatePaymentAsync(createPaymentRequest);
+            }
+
             return Ok(ApiResponse<PaymentResponseDto>.Ok(response));
         }
 
@@ -54,4 +74,6 @@ namespace dotnet_backend.Controllers
             return ipAddress ?? "127.0.0.1";
         }
     }
+
+    
 }

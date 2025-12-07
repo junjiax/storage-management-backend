@@ -14,5 +14,8 @@ namespace dotnet_backend.Services.Interfaces
 
       Task<RevenueByMothResponse> GetRevenueByMonthAsync(RevenueByMothRequest request);
 
+      Task<OrdersByDayResponse> GetOrdersByDayAsync(OrdersByDayRequest request);
+
+      Task<RatioByCategoryResponse> GetRatioByCategoryAsync(RatioByCategoryRequest request);
    }
 }
