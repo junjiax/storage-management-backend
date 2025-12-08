@@ -22,6 +22,9 @@ namespace dotnet_backend.DTOs.User
         [JsonPropertyName("fullName")]
         public string? FullName { get; set; }
 
+        [JsonPropertyName("password")]
+        public string? Password { get; set; }
+
         [JsonPropertyName("role")]
         public string? Role { get; set; }
     }
