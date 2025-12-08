@@ -95,14 +95,16 @@ namespace dotnet_backend.DTOs.Product
 
       public int? SupplierId { get; set; }
 
-      public string ProductName { get; set; } = string.Empty;
+      public string? ProductName { get; set; } = string.Empty;
 
       public string? Barcode { get; set; }
 
-      public decimal Price { get; set; }
+      public decimal? Price { get; set; }
 
-      public string Unit { get; set; } = "pcs";
+      public string? Unit { get; set; } = "pcs";
 
       public IFormFile? ImageFile { get; set; }
+
+
    }
 }

@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using dotnet_backend.Data;
+﻿using dotnet_backend.Data;
 using dotnet_backend.DTOs.Product;
+using dotnet_backend.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace dotnet_backend.Services
 {
@@ -28,7 +29,8 @@ namespace dotnet_backend.Services
                     CategoryName = p.Category != null ? p.Category.CategoryName : string.Empty,
                     SupplierId = p.SupplierId,
                     Barcode = p.Barcode,
-                    Unit = p.Unit,
+                    ProductImg = p.ProductImg,
+                   Unit = p.Unit,
                 })
                 .ToListAsync();
 
@@ -151,7 +153,7 @@ namespace dotnet_backend.Services
             CategoryId = request.CategoryId,
             SupplierId = request.SupplierId,
             Barcode = request.Barcode,
-            Price = request.Price,
+            Price = request.Price.HasValue ? request.Price.Value : 0,
             Unit = request.Unit,
             ProductImg = "",
             ProductPublicId = null
@@ -202,12 +204,24 @@ namespace dotnet_backend.Services
             throw new KeyNotFoundException("Product not found");
          }
 
-         product.ProductName = request.ProductName;
-         product.CategoryId = request.CategoryId;
-         product.SupplierId = request.SupplierId;
-         product.Barcode = request.Barcode;
-         product.Price = request.Price;
-         product.Unit = request.Unit;
+         // 🟢 Chỉ update nếu có giá trị
+         if (request.ProductName != null && request.ProductName.Length > 0)
+            product.ProductName = request.ProductName;
+
+         if (request.CategoryId.HasValue)
+            product.CategoryId = request.CategoryId.Value;
+
+         if (request.SupplierId.HasValue)
+            product.SupplierId = request.SupplierId.Value;
+
+         if (request.Barcode != null)
+            product.Barcode = request.Barcode;
+
+         if (request.Price.HasValue)
+            product.Price = request.Price.Value;
+
+         if (request.Unit != null)
+            product.Unit = request.Unit;
 
 
          if (request.ImageFile != null && request.ImageFile.Length > 0)
