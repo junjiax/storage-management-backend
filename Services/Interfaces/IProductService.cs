@@ -14,5 +14,11 @@ namespace dotnet_backend.Services
         Task<ProductResponse?> GetProductItemByIdAsync(int productId);
         Task<bool> ProductItemExistsAsync(int productId);
 
-    }
+      Task<ProductResponse> AddProductItemWithImageAsync(ProductWithUploadImgRequest request);
+      Task<ProductResponse> UpdateProductItemWithImageAsync(int productId, ProductWithUploadImgRequest request);
+
+
+
+
+   }
 }

@@ -78,7 +78,8 @@ namespace dotnet_backend.Controllers
 				Token = token,
 				ExpiresAt = expiresAt,
 				Username = user.Username,
-				Role = user.Role
+				Role = user.Role,
+				UserId = user.UserId
 			},
 				message: "Login successful",
 				statusCode: 200

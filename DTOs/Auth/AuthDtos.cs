@@ -28,6 +28,9 @@ namespace dotnet_backend.DTOs.Auth
 
 	public class AuthResponse
 	{
+		[JsonPropertyName("userId")]
+		public int UserId { get; set; }
+
 		[JsonPropertyName("token")]
 		public string Token { get; set; } = string.Empty;
 
