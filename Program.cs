@@ -2,6 +2,7 @@
 using dotnet_backend.Data;
 using dotnet_backend.Interfaces;
 using dotnet_backend.Libraries;
+using dotnet_backend.Models;
 using dotnet_backend.Repositories;
 using dotnet_backend.Services;
 using dotnet_backend.Services.Implementations;
@@ -57,6 +58,7 @@ builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IPromotionService, PromotionService>();
 
 
 // JWT Authentication

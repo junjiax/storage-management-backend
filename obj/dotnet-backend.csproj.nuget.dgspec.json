@@ -1,21 +1,21 @@
 {
   "format": 1,
   "restore": {
-    "D:\\storage_management\\backend\\dotnet-backend.csproj": {}
+    "C:\\Study\\CSharp\\Web\\RetailStore\\storage-management-backend\\dotnet-backend.csproj": {}
   },
   "projects": {
-    "D:\\storage_management\\backend\\dotnet-backend.csproj": {
+    "C:\\Study\\CSharp\\Web\\RetailStore\\storage-management-backend\\dotnet-backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\storage_management\\backend\\dotnet-backend.csproj",
+        "projectUniqueName": "C:\\Study\\CSharp\\Web\\RetailStore\\storage-management-backend\\dotnet-backend.csproj",
         "projectName": "dotnet-backend",
-        "projectPath": "D:\\storage_management\\backend\\dotnet-backend.csproj",
-        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "D:\\storage_management\\backend\\obj\\",
+        "projectPath": "C:\\Study\\CSharp\\Web\\RetailStore\\storage-management-backend\\dotnet-backend.csproj",
+        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+        "outputPath": "C:\\Study\\CSharp\\Web\\RetailStore\\storage-management-backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "D:\\storage_management\\backend\\NuGet.Config",
-          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Study\\CSharp\\Web\\RetailStore\\storage-management-backend\\NuGet.Config",
+          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -110,7 +110,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.308/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.307/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
