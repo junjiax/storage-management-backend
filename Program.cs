@@ -21,7 +21,7 @@ builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowVite", policy =>
 	{
-		policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173")
+		policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173", "http://127.0.0.1:5000")
 			.AllowAnyHeader()
 			.AllowAnyMethod()
 			.AllowCredentials();
@@ -51,7 +51,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
-
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 // Đăng ký Repository
