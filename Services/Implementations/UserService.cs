@@ -57,6 +57,11 @@ namespace dotnet_backend.Services
 			{
 				entity.FullName = request.FullName;
 			}
+			if (!string.IsNullOrWhiteSpace(request.Password))
+            {
+                entity.Password = PasswordHasher.Hash(request.Password);
+
+            }
 			if (!string.IsNullOrWhiteSpace(request.Role))
 			{
 				entity.Role = request.Role!;

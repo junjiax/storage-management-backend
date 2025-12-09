@@ -7883,8 +7883,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\X\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\X\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
@@ -7895,10 +7894,8 @@
       "packagesPath": "C:\\Users\\X\\.nuget\\packages\\",
       "outputPath": "D:\\dotnet_be\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
+        "D:\\dotnet_be\\NuGet.Config",
         "C:\\Users\\X\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
@@ -7907,7 +7904,6 @@
         "net9.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },

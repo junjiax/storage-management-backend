@@ -7,6 +7,7 @@ D:\dotnet_be\obj\Debug\net9.0\dotnet-backend.csproj.CoreCompileInputs.cache
 D:\dotnet_be\obj\Debug\net9.0\dotnet-backend.MvcApplicationPartsAssemblyInfo.cs
 D:\dotnet_be\obj\Debug\net9.0\dotnet-backend.MvcApplicationPartsAssemblyInfo.cache
 D:\dotnet_be\obj\Debug\net9.0\dotnet-backend.sourcelink.json
+D:\dotnet_be\bin\Debug\net9.0\NuGet.config
 D:\dotnet_be\bin\Debug\net9.0\appsettings.Development.json
 D:\dotnet_be\bin\Debug\net9.0\appsettings.json
 D:\dotnet_be\bin\Debug\net9.0\dotnet-backend.staticwebassets.endpoints.json
@@ -211,4 +212,3 @@ D:\dotnet_be\obj\Debug\net9.0\refint\dotnet-backend.dll
 D:\dotnet_be\obj\Debug\net9.0\dotnet-backend.pdb
 D:\dotnet_be\obj\Debug\net9.0\dotnet-backend.genruntimeconfig.cache
 D:\dotnet_be\obj\Debug\net9.0\ref\dotnet-backend.dll
-D:\dotnet_be\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

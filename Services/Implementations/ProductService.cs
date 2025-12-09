@@ -20,6 +20,7 @@ namespace dotnet_backend.Services
         {
             var products = await _context.Products
                 .Include(p => p.Category)
+                .Include(p => p.Supplier)
                 .Select(p => new ProductResponse
                 {
                     ProductId = p.ProductId,
@@ -28,6 +29,7 @@ namespace dotnet_backend.Services
                     CategoryId = p.CategoryId,
                     CategoryName = p.Category != null ? p.Category.CategoryName : string.Empty,
                     SupplierId = p.SupplierId,
+                    SupplierName = p.Supplier != null ? p.Supplier.Name : string.Empty,
                     Barcode = p.Barcode,
                     ProductImg = p.ProductImg,
                    Unit = p.Unit,
@@ -153,7 +155,7 @@ namespace dotnet_backend.Services
             CategoryId = request.CategoryId,
             SupplierId = request.SupplierId,
             Barcode = request.Barcode,
-            Price = request.Price.HasValue ? request.Price.Value : 0,
+            Price = request.Price != null ? request.Price : 0,
             Unit = request.Unit,
             ProductImg = "",
             ProductPublicId = null
@@ -217,8 +219,8 @@ namespace dotnet_backend.Services
          if (request.Barcode != null)
             product.Barcode = request.Barcode;
 
-         if (request.Price.HasValue)
-            product.Price = request.Price.Value;
+         if (request.Price != null)
+            product.Price = request.Price;
 
          if (request.Unit != null)
             product.Unit = request.Unit;
