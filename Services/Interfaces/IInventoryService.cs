@@ -5,11 +5,11 @@ namespace dotnet_backend.Services
     public interface IInventoryService
     {
         Task<List<InventoryResponse>> GetInventoryListAsync();
+        Task<List<InventoryLogDto>> GetProductLogAsync(int productId);
         Task<InventoryResponse> AddInventoryItemAsync(InventoryRequest request);
         Task<InventoryResponse> UpdateInventoryItemAsync(int inventoryId, InventoryRequest request);
         Task<bool> DeleteInventoryItemAsync(int inventoryId);
         Task<InventoryResponse?> GetInventoryItemByIdAsync(int inventoryId);
         Task<bool> InventoryItemExistsAsync(int inventoryId);
-
     }
 }

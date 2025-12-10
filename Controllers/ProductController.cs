@@ -59,6 +59,21 @@ namespace dotnet_backend.Controllers
             );
         }
 
+        [HttpPost("with-image")]
+        public async Task<ActionResult<ApiResponse<ProductResponse>>> AddProductWithImageFile([FromBody] ProductWithUploadImgRequest request)
+        {
+            var product = await _productService.AddProductItemWithImageAsync(request);
+
+            return CreatedAtAction(
+                nameof(GetProductById),
+                new { productId = product.ProductId },
+                ApiResponse<ProductResponse>.Ok(
+                    data: product,
+                    message: "Product added successfully"
+                )
+            );
+        }
+
         [HttpPut("{productId}")]
         public async Task<ActionResult<ApiResponse<ProductResponse>>> UpdateProduct(int productId, [FromBody] ProductRequest request)
         {

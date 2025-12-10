@@ -38,7 +38,7 @@ namespace dotnet_backend.Models
     public string ProductImg { get; set; } = string.Empty;
 
     [Column("product_public_id")]
-    public string? ProductPublicId { get; set; }
+    public string? ProductPublicId { get; set; } = string.Empty;
 
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

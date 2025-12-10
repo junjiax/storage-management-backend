@@ -21,6 +21,12 @@ namespace dotnet_backend.DTOs.Product
 
         [JsonPropertyName("unit")]
         public string Unit { get; set; } = "pcs";
+
+        [JsonPropertyName("productImg")]
+        public string? ProductImg { get; set; }
+
+        [JsonPropertyName("productPublicId")]
+        public string? ProductPublicId { get; set; }
     }
 
     public class UpdateProductRequest
@@ -42,6 +48,12 @@ namespace dotnet_backend.DTOs.Product
 
         [JsonPropertyName("unit")]
         public string? Unit { get; set; }
+        
+        [JsonPropertyName("productImg")]
+        public string? ProductImg { get; set; }
+        
+        [JsonPropertyName("productPublicId")]
+        public string? ProductPublicId { get; set; }
     }
 
     public class ProductResponse
@@ -75,6 +87,9 @@ namespace dotnet_backend.DTOs.Product
 
         [JsonPropertyName("productImg")]
         public string? ProductImg { get; set; }
+
+        [JsonPropertyName("productPublicId")]
+        public string? ProductPublicId{ get; set; }
 
         [JsonPropertyName("createdAt")]
         public DateTime CreatedAt { get; set; }

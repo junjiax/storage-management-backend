@@ -24,9 +24,9 @@ namespace dotnet_backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddInventory()
+        public async Task<IActionResult> AddInventory([FromBody] InventoryRequest request)
         {
-            var items = await _inventoryService.AddInventoryItemAsync(new InventoryRequest());
+            var items = await _inventoryService.AddInventoryItemAsync(request);
             return Ok(ApiResponse<InventoryResponse>.Ok(items, "Added inventory", 201));
         }
 
@@ -64,6 +64,18 @@ namespace dotnet_backend.Controllers
             }
 
             return Ok(ApiResponse<InventoryResponse>.Ok(item));
+        }
+
+        [HttpGet("product-log/{productId}")]
+        public async Task<IActionResult> GetProductLog(int productId)
+        {
+            var item = await _inventoryService.GetProductLogAsync(productId);
+            if (item == null)
+            {
+                return NotFound(ApiResponse<InventoryResponse>.Fail("Inventory item not found", 404));
+            }
+
+            return Ok(ApiResponse<List<InventoryLogDto>>.Ok(item));
         }
 
         [HttpGet("exists/{inventoryId}")]

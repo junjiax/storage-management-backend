@@ -24,6 +24,8 @@ namespace dotnet_backend.Services
                     InventoryId = i.InventoryId,
                     ProductId = i.ProductId,
                     ProductName = i.Product != null ? i.Product.ProductName : string.Empty,
+                    ProductImg = i.Product != null ? i.Product.ProductImg : string.Empty,
+                    ProductPublicId = i.Product != null ? i.Product.ProductPublicId : string.Empty,
                     Quantity = i.Quantity,
                     UpdatedAt = i.UpdatedAt
                 })
@@ -65,7 +67,7 @@ namespace dotnet_backend.Services
             }
 
             item.ProductId = request.ProductId;
-            item.Quantity = request.Quantity;
+            item.Quantity += request.Quantity;
             item.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -115,10 +117,79 @@ namespace dotnet_backend.Services
                 UpdatedAt = item.UpdatedAt
             };
         }
-        
+
         public async Task<bool> InventoryItemExistsAsync(int inventoryId)
         {
             return await _context.Inventory.AnyAsync(i => i.InventoryId == inventoryId);
         }
+
+        public async Task<List<InventoryLogDto>> GetProductLogAsync(int productId)
+        {
+            var logs = new List<InventoryLogDto>();
+
+            // Lấy log nhập hàng
+            var inventoryUpdates = await _context.Inventory
+                .Where(i => i.ProductId == productId)
+                .OrderBy(i => i.UpdatedAt)
+                .ToListAsync();
+
+            // Lấy log bán hàng
+            var sales = await _context.OrderItems
+                .Where(oi => oi.ProductId == productId)
+                .Join(_context.Orders.Where(o => o.Status == "paid"),
+                      oi => oi.OrderId,
+                      o => o.OrderId,
+                      (oi, o) => new
+                      {
+                          o.OrderId,
+                          o.OrderDate,
+                          oi.Quantity
+                      })
+                .OrderBy(x => x.OrderDate)
+                .ToListAsync();
+
+            // Tính tồn kho theo thời gian
+            int stock = 0;
+
+            // Đưa inventory update vào stock trước (vì phải cộng vào trước khi bán)
+            foreach (var inv in inventoryUpdates.OrderBy(i => i.UpdatedAt))
+            {
+                stock += inv.Quantity; // tăng số lượng nhập
+
+                logs.Add(new InventoryLogDto
+                {
+                    Type = "nhập hàng",
+                    Date = inv.UpdatedAt.ToString("dd/MM/yyyy"),
+                    Quantity = inv.Quantity,
+                    OrderId = null,
+                    QuantitySold = null,
+                    StockRemaining = stock
+                });
+            }
+
+            // Tính theo timeline bán hàng
+            foreach (var item in sales)
+            {
+                stock -= item.Quantity; // giảm số lượng bán
+
+                logs.Add(new InventoryLogDto
+                {
+                    Type = "bán hàng",
+                    Date = item.OrderDate.ToString("dd/MM/yyyy"),
+                    Quantity = item.Quantity,
+                    OrderId = item.OrderId,
+                    QuantitySold = item.Quantity,
+                    StockRemaining = stock
+                });
+            }
+
+            // Gom chung và sắp xếp theo ngày
+            logs = logs
+                .OrderBy(l => DateTime.ParseExact(l.Date, "dd/MM/yyyy", null))
+                .ToList();
+
+            return logs;
+        }
+
     }
 }
