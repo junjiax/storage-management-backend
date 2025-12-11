@@ -31,7 +31,7 @@ namespace dotnet_backend.Controllers
             // Get IP address from HttpContext
             var ipAddress = GetIpAddress(HttpContext);
             var url = _vnPayService.CreatePaymentUrl(model, ipAddress);
-            return Ok(ApiResponse<object>.Ok(new { paymentUrl = url }));
+            return Ok(ApiResponse<PaymentUrlResponse>.Ok(new PaymentUrlResponse { PaymentUrl = url }));
 
             // Nếu muốn redirect trực tiếp từ trình duyệt:
             // return Redirect(url);
@@ -42,7 +42,11 @@ namespace dotnet_backend.Controllers
         public async Task<IActionResult> PaymentCallbackVnpay()
         {
             // Convert IQueryCollection to Dictionary
+
             var response = _vnPayService.PaymentExecute(Request.Query);
+            
+         
+          string redirectUrl;
 
             if (response.Success)
             {
@@ -55,10 +59,33 @@ namespace dotnet_backend.Controllers
                 };
 
                 await _paymentService.CreatePaymentAsync(createPaymentRequest);
+
+               redirectUrl = $"http://localhost:5000/payment-success?orderId={response.OrderId}";
+            }
+            else
+            {
+               redirectUrl = $"http://localhost:5000/payment-failed";
             }
 
-            return Ok(ApiResponse<PaymentResponseDto>.Ok(response));
-        }
+
+             var html = $@"
+             <html>
+             <body>
+                 <script>
+                     if (window.opener) {{
+                         window.opener.location.href = '{redirectUrl}';
+                         window.close();
+                     }} else {{
+                         // fallback: redirect trong chính popup
+                         window.location.href = '{redirectUrl}';
+                     }}
+                 </script>
+                 <p>Đang xử lý thanh toán...</p>
+             </body>
+             </html>";
+
+             return Content(html, "text/html");
+      }
 
         private string GetIpAddress(HttpContext context)
         {

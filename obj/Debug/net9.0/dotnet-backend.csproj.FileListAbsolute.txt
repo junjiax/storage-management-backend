@@ -212,3 +212,4 @@ D:\dotnet_be\obj\Debug\net9.0\refint\dotnet-backend.dll
 D:\dotnet_be\obj\Debug\net9.0\dotnet-backend.pdb
 D:\dotnet_be\obj\Debug\net9.0\dotnet-backend.genruntimeconfig.cache
 D:\dotnet_be\obj\Debug\net9.0\ref\dotnet-backend.dll
+D:\dotnet_be\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

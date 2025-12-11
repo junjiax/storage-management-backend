@@ -28,7 +28,6 @@ namespace dotnet_backend.Controllers
                     OrderId = order.OrderId,
                     CustomerId = order.CustomerId,
                     UserId = order.UserId,
-
                     PromoId = order.PromoId,
                     OrderDate = order.OrderDate,
                     Status = order.Status,

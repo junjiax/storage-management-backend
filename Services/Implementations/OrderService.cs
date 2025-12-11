@@ -75,13 +75,13 @@ namespace dotnet_backend.Services.Implementations
             {
                 promo = await _context.Promotions
                     .FirstOrDefaultAsync(p => p.PromoId == request.PromoId);
-                if (promo!.DiscountType == "percent")
+                if (promo!.DiscountType == "percentage")
                 {
                     order.DiscountAmount = totalAmount * promo!.DiscountValue / 100;
                     order.TotalAmount = totalAmount - order.DiscountAmount;
 
                 }
-                else if (promo!.DiscountType == "fixed")
+                else if (promo!.DiscountType == "fixed_amount")
                 {
                     order.DiscountAmount = promo!.DiscountValue;
                     order.TotalAmount = totalAmount - order.DiscountAmount;

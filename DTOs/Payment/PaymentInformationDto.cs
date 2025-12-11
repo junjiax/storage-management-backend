@@ -8,4 +8,8 @@ namespace dotnet_backend.DTOs.Payment
         public string OrderDescription { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
     }
+      public class PaymentUrlResponse
+      {
+         public string PaymentUrl { get; set; }
+      }
 }

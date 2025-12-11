@@ -59,33 +59,33 @@ namespace dotnet_backend.Services
             }).ToList();
         }
 
-        public async Task<List<PromotionResponse>?> GetPromotionsWithMinOrderAmountGreaterThanAsync(decimal minOrderAmount)
-        {
-            var now = DateTime.UtcNow;
+           public async Task<List<PromotionResponse>?> GetApplicablePromotionsAsync(decimal minOrderAmount)
+           {
+               var now = DateTime.UtcNow;
 
-            var promotions = await _context.Promotions
-                .Where(p => p.MinOrderAmount <= minOrderAmount
-                            && p.EndDate >= now
-                            && p.Status == "active")
-                .ToListAsync();
+               var promotions = await _context.Promotions
+                   .Where(p => p.MinOrderAmount <= minOrderAmount
+                               && p.EndDate >= now
+                               && p.Status == "active")
+                   .ToListAsync();
 
-            var promotionResponses = promotions.Select(p => new PromotionResponse
-            {
-                PromoId = p.PromoId,
-                PromoCode = p.PromoCode,
-                Description = p.Description,
-                DiscountType = p.DiscountType,
-                DiscountValue = p.DiscountValue,
-                StartDate = p.StartDate,
-                EndDate = p.EndDate,
-                MinOrderAmount = p.MinOrderAmount,
-                UsageLimit = p.UsageLimit,
-                UsedCount = p.UsedCount,
-                Status = p.Status
-            }).ToList();
+               var promotionResponses = promotions.Select(p => new PromotionResponse
+               {
+                   PromoId = p.PromoId,
+                   PromoCode = p.PromoCode,
+                   Description = p.Description,
+                   DiscountType = p.DiscountType,
+                   DiscountValue = p.DiscountValue,
+                   StartDate = p.StartDate,
+                   EndDate = p.EndDate,
+                   MinOrderAmount = p.MinOrderAmount,
+                   UsageLimit = p.UsageLimit,
+                   UsedCount = p.UsedCount,
+                   Status = p.Status
+               }).ToList();
 
-            return promotionResponses;
-        }
+               return promotionResponses;
+           }
 
         // Lấy chi tiết khuyến mãi theo ID
         public async Task<PromotionResponse?> GetPromotionByIdAsync(int id)

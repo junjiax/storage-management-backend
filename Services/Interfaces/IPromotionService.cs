@@ -8,7 +8,7 @@ namespace dotnet_backend.Services
     public interface IPromotionService
     {
         Task<List<PromotionResponse>> GetPromotionListAsync();
-        Task<List<PromotionResponse>?> GetPromotionsWithMinOrderAmountGreaterThanAsync(decimal minOrderAmount);
+        Task<List<PromotionResponse>?> GetApplicablePromotionsAsync(decimal minOrderAmount);
         Task<PromotionResponse?> GetPromotionByIdAsync(int id);
         Task<PromotionResponse> AddPromotionAsync(CreatePromotionRequest request);
         Task<PromotionResponse> UpdatePromotionAsync(int id, UpdatePromotionRequest request);
