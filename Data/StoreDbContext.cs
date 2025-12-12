@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using dotnet_backend.Models;
 
-namespace dotnet_backend.Data{
+namespace dotnet_backend.Data
+{
     public class StoreDbContext : DbContext
     {
         public StoreDbContext(DbContextOptions<StoreDbContext> options)
@@ -44,9 +45,6 @@ namespace dotnet_backend.Data{
             modelBuilder.Entity<Payment>()
                 .Property(p => p.PaymentMethod)
                 .HasConversion<string>();
-       
-
-            
         }
     }
 }
