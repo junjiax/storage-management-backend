@@ -1,4 +1,4 @@
-using dotnet_backend.DTOs.Common;
+﻿using dotnet_backend.DTOs.Common;
 using dotnet_backend.DTOs.Promotion;
 using dotnet_backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -28,9 +28,9 @@ namespace dotnet_backend.Controllers
         }
 
         [HttpGet("min-order/{minOrderAmount}")]
-        public async Task<IActionResult> GetPromotionsWithMinOrderAmountGreaterThanAsync(decimal minOrderAmount)
+        public async Task<IActionResult> GetApplicablePromotionsAsync(decimal minOrderAmount)
         {
-            var response = await _promotionService.GetPromotionsWithMinOrderAmountGreaterThanAsync(minOrderAmount);
+            var response = await _promotionService.GetApplicablePromotionsAsync(minOrderAmount);
             if (response == null)
                 return NotFound(ApiResponse<string>.Fail(
                     "Promotion not found",

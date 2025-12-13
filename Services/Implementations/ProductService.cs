@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using dotnet_backend.Data;
+﻿using dotnet_backend.Data;
 using dotnet_backend.DTOs.Product;
+using dotnet_backend.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace dotnet_backend.Services
 {
@@ -30,9 +31,8 @@ namespace dotnet_backend.Services
                     SupplierId = p.SupplierId,
                     SupplierName = p.Supplier != null ? p.Supplier.Name : string.Empty,
                     Barcode = p.Barcode,
-                    Unit = p.Unit,
                     ProductImg = p.ProductImg,
-                    ProductPublicId = p.ProductPublicId,
+                    Unit = p.Unit,
                 })
                 .ToListAsync();
 
@@ -136,7 +136,8 @@ namespace dotnet_backend.Services
                 SupplierId = product.SupplierId,
                 Barcode = product.Barcode,
                 Price = product.Price,
-                Unit = product.Unit
+                Unit = product.Unit,
+                ProductImg = product.ProductImg
             };
         }
 
@@ -144,9 +145,6 @@ namespace dotnet_backend.Services
         {
             return await _context.Products.AnyAsync(p => p.ProductId == productId);
         }
-
-
-
 
         public async Task<ProductResponse> AddProductItemWithImageAsync(ProductWithUploadImgRequest request)
         {
@@ -156,7 +154,7 @@ namespace dotnet_backend.Services
                 CategoryId = request.CategoryId,
                 SupplierId = request.SupplierId,
                 Barcode = request.Barcode,
-                Price = request.Price,
+                Price = request.Price != null ? request.Price : 0,
                 Unit = request.Unit,
                 ProductImg = "",
                 ProductPublicId = null
@@ -214,18 +212,16 @@ namespace dotnet_backend.Services
             product.Price = request.Price;
             product.Unit = request.Unit;
 
-
             if (request.ImageFile != null && request.ImageFile.Length > 0)
             {
-                // 2. Tải ảnh MỚI
                 string newPublicId = $"products/{product.ProductId}/{Guid.NewGuid()}";
                 string newImageUrl = await _imageUploadService.UploadImageAsync(request.ImageFile, newPublicId);
 
-                // 3. Cập nhật thông tin ảnh MỚI vào DB
+                string oldPublicId = product.ProductPublicId;
+
                 product.ProductImg = newImageUrl;
                 product.ProductPublicId = newPublicId;
 
-                string oldPublicId = product.ProductPublicId;
                 if (!string.IsNullOrEmpty(oldPublicId))
                 {
                     _ = Task.Run(async () =>
@@ -234,15 +230,12 @@ namespace dotnet_backend.Services
                         {
                             await _imageUploadService.DeleteImageAsync(oldPublicId);
                         }
-                        catch (Exception ex)
+                        catch
                         {
-                            // Ghi log lỗi lại
-                            // _logger.LogWarning(ex, "Lỗi xóa ảnh nền Cloudinary");
                         }
                     });
                 }
             }
-
 
             await _context.SaveChangesAsync();
 
@@ -260,9 +253,72 @@ namespace dotnet_backend.Services
                 Unit = product.Unit,
                 ProductImg = product.ProductImg
             };
-
-
-
         }
+
+        // public async Task<ProductResponse> UpdateProductItemWithImageAsync(int productId, ProductWithUploadImgRequest request)
+        // {
+        //     var product = await _context.Products.FindAsync(productId);
+        //     if (product == null)
+        //     {
+        //         throw new KeyNotFoundException("Product not found");
+        //     }
+
+        //     product.ProductName = request.ProductName;
+        //     product.CategoryId = request.CategoryId;
+        //     product.SupplierId = request.SupplierId;
+        //     product.Barcode = request.Barcode;
+        //     product.Price = request.Price;
+        //     product.Unit = request.Unit;
+
+
+        //     if (request.ImageFile != null && request.ImageFile.Length > 0)
+        //     {
+        //         // 2. Tải ảnh MỚI
+        //         string newPublicId = $"products/{product.ProductId}/{Guid.NewGuid()}";
+        //         string newImageUrl = await _imageUploadService.UploadImageAsync(request.ImageFile, newPublicId);
+
+        //         // 3. Cập nhật thông tin ảnh MỚI vào DB
+        //         product.ProductImg = newImageUrl;
+        //         product.ProductPublicId = newPublicId;
+
+        //         string oldPublicId = product.ProductPublicId;
+        //         if (!string.IsNullOrEmpty(oldPublicId))
+        //         {
+        //             _ = Task.Run(async () =>
+        //             {
+        //                 try
+        //                 {
+        //                     await _imageUploadService.DeleteImageAsync(oldPublicId);
+        //                 }
+        //                 catch (Exception ex)
+        //                 {
+        //                     // Ghi log lỗi lại
+        //                     // _logger.LogWarning(ex, "Lỗi xóa ảnh nền Cloudinary");
+        //                 }
+        //             });
+        //         }
+        //     }
+
+
+        //     await _context.SaveChangesAsync();
+
+        //     var category = await _context.Categories.FindAsync(product.CategoryId);
+
+        //     return new ProductResponse
+        //     {
+        //         ProductId = product.ProductId,
+        //         ProductName = product.ProductName,
+        //         CategoryId = product.CategoryId,
+        //         CategoryName = category != null ? category.CategoryName : string.Empty,
+        //         SupplierId = product.SupplierId,
+        //         Barcode = product.Barcode,
+        //         Price = product.Price,
+        //         Unit = product.Unit,
+        //         ProductImg = product.ProductImg
+        //     };
+
+
+
+        // }
     }
 }

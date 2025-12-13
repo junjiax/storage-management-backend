@@ -1,4 +1,4 @@
-﻿﻿using dotnet_backend.Data;
+﻿using dotnet_backend.Data;
 using dotnet_backend.DTOs.Report;
 using dotnet_backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -85,18 +85,18 @@ namespace dotnet_backend.Repositories
             }
 
             // Lọc theo ngày Payment của Order
-            // if (request.StartDate.HasValue)
-            // {
-            //    itemQuery = itemQuery.Where(item =>
-            //        item.Order.Payments.Any(p => p.PaymentDate >= request.StartDate.Value)
-            //    );
-            // }
-            // if (request.EndDate.HasValue)
-            // {
-            //    itemQuery = itemQuery.Where(item =>
-            //        item.Order.Payments.Any(p => p.PaymentDate < request.EndDate.Value.AddDays(1))
-            //    );
-            // }
+            //if (request.StartDate.HasValue)
+            //{
+            //   itemQuery = itemQuery.Where(item =>
+            //       item.Order.Payments.Any(p => p.PaymentDate >= request.StartDate.Value)
+            //   );
+            //}
+            //if (request.EndDate.HasValue)
+            //{
+            //   itemQuery = itemQuery.Where(item =>
+            //       item.Order.Payments.Any(p => p.PaymentDate < request.EndDate.Value.AddDays(1))
+            //   );
+            //}
 
             // Tính tổng Subtotal của CHỈ các item đã lọc
             totalRevenue = await itemQuery.SumAsync(item => item.Subtotal);
@@ -225,6 +225,229 @@ namespace dotnet_backend.Repositories
             TotalPromotionsUsed = usedPromoTask
          };
       }
+
+      public async Task<SimpleReportResponse> GetSimpleReportAsync(SimpleReportRequest request)
+      {
+
+         // === 1. CHUYỂN ĐỔI YYYY-MM THÀNH START/END DATE ===
+         var (startYear, startMonth) = SplitYearMonth(request.StartDate);
+         var (endYear, endMonth) = SplitYearMonth(request.EndDate);
+         // Ngày đầu tháng
+         DateTime currentStartDate = new DateTime(startYear, startMonth, 1);
+         // Ngày cuối tháng (đúng 28, 29, 30, 31)
+         DateTime currentEndDate = new DateTime(
+             endYear,
+             endMonth,
+             DateTime.DaysInMonth(endYear, endMonth)
+         );
+
+         // Dùng Exclusive để dễ query
+         DateTime currentEndDateExclusive = currentEndDate.AddDays(1);
+
+         // === 2. TÍNH KỲ TRƯỚC ===
+         TimeSpan duration = currentEndDateExclusive - currentStartDate;
+
+         DateTime prevEndExclusive = currentStartDate;
+         DateTime prevStartDate = currentStartDate - duration;
+         // === 3. QUERY KỲ HIỆN TẠI ===
+         IQueryable<Order> currentOrdersQuery = _context.Orders
+             .Where(o => o.OrderDate >= currentStartDate &&
+                         o.OrderDate < currentEndDateExclusive);
+
+         decimal totalRevenue = await currentOrdersQuery.SumAsync(o => o.TotalAmount);
+         int totalOrders = await currentOrdersQuery.CountAsync();
+
+         // Danh sách khách hàng trong kỳ
+         var customerIdsInPeriod = await currentOrdersQuery
+             .Where(o => o.CustomerId != null)
+             .Select(o => o.CustomerId.Value)
+             .Distinct()
+             .ToListAsync();
+
+         // === 4. QUERY KỲ TRƯỚC ===
+         decimal totalPrevRevenue = 0;
+
+         IQueryable<Order> prevOrdersQuery = _context.Orders
+             .Where(o => o.OrderDate >= prevStartDate &&
+                         o.OrderDate < prevEndExclusive);
+
+         totalPrevRevenue = await prevOrdersQuery.SumAsync(o => o.TotalAmount);
+
+         // === 5. TÍNH KHÁCH HÀNG MỚI (First Order trong khoảng) ===
+         int newCustomers = 0;
+
+         if (customerIdsInPeriod.Any())
+         {
+            var firstOrderDates = _context.Orders
+                .Where(o => o.CustomerId != null && customerIdsInPeriod.Contains(o.CustomerId.Value))
+                .GroupBy(o => o.CustomerId.Value)
+                .Select(g => new { FirstOrderDate = g.Min(o => o.OrderDate) });
+
+            newCustomers = await firstOrderDates
+                .Where(x => x.FirstOrderDate >= currentStartDate &&
+                            x.FirstOrderDate < currentEndDateExclusive)
+                .CountAsync();
+         }
+
+         // === 6. TÍNH TĂNG TRƯỞNG ===
+         double growthRate = 0;
+
+         if (totalPrevRevenue > 0)
+         {
+            growthRate = ((double)totalRevenue - (double)totalPrevRevenue)
+                         / (double)totalPrevRevenue * 100.0;
+         }
+         else if (totalRevenue > 0)
+         {
+            growthRate = 100.0;
+         }
+
+         // === 7. TRẢ KẾT QUẢ ===
+         return new SimpleReportResponse
+         {
+            TotalRevenue = totalRevenue,
+            TotalOrders = totalOrders,
+            NewCustomers = newCustomers,
+            GrowthRate = Math.Round(growthRate, 2)
+         };
+      }
+
+      public async Task<RevenueByMothResponse> GetRevenueByMonthAsync(RevenueByMothRequest request)
+      {
+         // Split YYYY-MM
+         var (startYear, startMonth) = SplitYearMonth(request.StartDate);
+         var (endYear, endMonth) = SplitYearMonth(request.EndDate);
+
+         var startDate = new DateTime(startYear, startMonth, 1);
+         var endDate = new DateTime(endYear, endMonth, DateTime.DaysInMonth(endYear, endMonth));
+
+         Console.WriteLine(">>>>>>>>>>>>"+startDate + endDate);
+         // Query DB
+         var revenueByMonthDb = await _context.Orders
+             .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate)
+             .GroupBy(o => new { o.OrderDate.Year, o.OrderDate.Month })
+             .Select(g => new MonthlyRevenueData
+             {
+                Month = g.Key.Month,
+                Revenue = g.Sum(o => o.TotalAmount),
+                Orders = g.Count()
+             })
+             .ToDictionaryAsync(x => x.Month);
+
+         // Build list month range
+         var months = Enumerable.Range(startMonth, endMonth - startMonth + 1).ToList();
+
+         var result = new List<MonthlyRevenueData>();
+         foreach (var m in months)
+         {
+            result.Add(revenueByMonthDb.TryGetValue(m, out var data)
+                ? data
+                : new MonthlyRevenueData { Month = m, Revenue = 0, Orders = 0 });
+         }
+
+         return new RevenueByMothResponse
+         {
+            Year = startYear,
+            MonthlyRevenues = result
+         };
+      }
+
+      public async Task<RatioByCategoryResponse> GetRatioByCategoryAsync(RatioByCategoryRequest request)
+      {
+         // Split YYYY-MM
+         var (startYear, startMonth) = SplitYearMonth(request.StartDate);
+         var (endYear, endMonth) = SplitYearMonth(request.EndDate);
+
+         var startDate = new DateTime(startYear, startMonth, 1);
+         var endDate = new DateTime(endYear, endMonth, DateTime.DaysInMonth(endYear, endMonth));
+
+         Console.WriteLine(">>>>>>>>>>>>" + startDate + endDate);
+
+         var query = _context.OrderItems
+        // Include các bảng liên quan để truy cập thuộc tính
+        .Include(oi => oi.Order)
+        .Include(oi => oi.Product)
+        .ThenInclude(p => p.Category)
+        // Điều kiện lọc
+        .Where(oi => oi.Order.OrderDate >= startDate &&
+                     oi.Order.OrderDate <= endDate)
+        // (Tuỳ chọn) Bạn nên lọc thêm Status nếu chỉ muốn tính đơn hàng thành công
+        // .Where(oi => oi.Order.Status == "completed") 
+
+        // Gom nhóm theo Tên danh mục
+        // Sử dụng toán tử ?. và ?? để xử lý trường hợp Product chưa có Category (null)
+        .GroupBy(oi => oi.Product.Category.CategoryName)
+
+        // Chọn ra dữ liệu cần thiết
+        .Select(g => new RatioByCategoryData
+        {
+           Type = g.Key ?? "Chưa phân loại", // Tên danh mục (CategoryName)
+           Value = g.Sum(oi => oi.Quantity)  // Tổng số lượng bán ra
+        });
+
+         // 3. Thực thi truy vấn và trả về kết quả
+         var resultData = await query.ToListAsync();
+
+         return new RatioByCategoryResponse
+         {
+            Ratios = resultData
+         };
+
+      }
+
+      private (int Year, int Month) SplitYearMonth(string ym)
+      {
+         var parts = ym.Split('-');
+         if (parts.Length != 2)
+            throw new Exception("Định dạng tháng phải là YYYY-MM");
+
+         return (int.Parse(parts[0]), int.Parse(parts[1]));
+      }
+      public async Task<OrdersByDayResponse> GetOrdersByDayAsync(OrdersByDayRequest request)
+      {
+         var query = _context.Orders
+             .Where(o => o.OrderDate.Year == request.Year && o.OrderDate.Month == request.Month);
+
+         var dbData = await query
+             .GroupBy(o => o.OrderDate.Day)
+             .Select(g => new
+             {
+                //Date = new DateTime(request.Year, request.Month, g.Key),
+                Date = g.Key,
+                Orders = g.Count(),     
+                
+             })
+             .OrderBy(s => s.Date)
+             .ToListAsync();
+
+         int daysInMonth = DateTime.DaysInMonth(request.Year, request.Month);
+
+         var result = new List<DailyOrdersData>();
+         for (int day = 1; day <= daysInMonth; day++)
+         {
+            var record = dbData.FirstOrDefault(x => x.Date == day);
+
+            var dailyData = new DailyOrdersData
+            {
+               Date = new DateTime(request.Year, request.Month, day),
+               Orders = record != null ? record.Orders : 0
+            };
+
+            result.Add(dailyData);
+         }
+         var response = new OrdersByDayResponse
+         {
+            DailyOrders = result,
+            Month = request.Month,
+            Year = request.Year
+         };
+
+         return response;
+
+      }
+
+
+
    }
 
 

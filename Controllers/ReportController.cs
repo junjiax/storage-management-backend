@@ -101,5 +101,113 @@ namespace dotnet_backend.Controllers
          }
       }
 
+
+      [HttpGet("simple-report")] // API mới
+      [ProducesResponseType(typeof(ApiResponse<SimpleReportResponse>), 200)]
+      [ProducesResponseType(typeof(ApiResponse), 400)]
+      [ProducesResponseType(typeof(ApiResponse), 500)]
+      public async Task<IActionResult> GetSimpleReport([FromQuery] SimpleReportRequest request)
+      {
+         try
+         {
+            var reportData = await _reportService.GetSimpleReportAsync(request);
+
+            var response = ApiResponse<SimpleReportResponse>.Ok(reportData, "Lấy báo cáo tổng hợp thành công.");
+
+            return Ok(response);
+         }
+         catch (ArgumentException ex) // Bắt lỗi validation từ Service
+         {
+            return BadRequest(ApiResponse.Fail(ex.Message, 400));
+         }
+         catch (Exception ex)
+         {
+            // (Nên log lỗi 'ex' ở đây)
+            var response = ApiResponse.Fail("Đã xảy ra lỗi hệ thống, vui lòng thử lại.", 500);
+            return StatusCode(500, response);
+         }
+      }
+
+      [HttpGet("revenue-by-month")] // API: GET /api/report/revenue-by-month?Year=2025
+      [ProducesResponseType(typeof(ApiResponse<RevenueByMothResponse>), 200)]
+      [ProducesResponseType(typeof(ApiResponse), 400)]
+      [ProducesResponseType(typeof(ApiResponse), 500)]
+      public async Task<IActionResult> GetRevenueByMonth([FromQuery] RevenueByMothRequest request)
+      {
+         try
+         {
+            var reportData = await _reportService.GetRevenueByMonthAsync(request);
+
+            var response = ApiResponse<RevenueByMothResponse>.Ok(reportData, "Lấy báo cáo doanh thu theo tháng thành công.");
+
+            return Ok(response);
+         }
+         catch (ArgumentException ex) // Bắt lỗi validation từ Service
+         {
+            return BadRequest(ApiResponse.Fail(ex.Message, 400));
+         }
+         catch (Exception ex)
+         {
+            // (Nên log lỗi 'ex' ở đây)
+            var response = ApiResponse.Fail("Đã xảy ra lỗi hệ thống, vui lòng thử lại.", 500);
+            return StatusCode(500, response);
+         }
+      }
+
+
+      [HttpGet("ratio-by-category")] // API: GET /api/report/ratio-by-category
+      [ProducesResponseType(typeof(ApiResponse<RatioByCategoryRequest>), 200)]
+      [ProducesResponseType(typeof(ApiResponse), 400)]
+      [ProducesResponseType(typeof(ApiResponse), 500)]
+      public async Task<IActionResult> GetRatioByCategory([FromQuery] RatioByCategoryRequest request)
+      {
+         try
+         {
+            var reportData = await _reportService.GetRatioByCategoryAsync(request);
+
+            var response = ApiResponse<RatioByCategoryResponse>.Ok(reportData, "Lấy báo cáo tỉ lệ theo danh mục sản phẩm thành công.");
+
+            return Ok(response);
+         }
+         catch (ArgumentException ex) // Bắt lỗi validation từ Service
+         {
+            return BadRequest(ApiResponse.Fail(ex.Message, 400));
+         }
+         catch (Exception ex)
+         {
+            // (Nên log lỗi 'ex' ở đây)
+            var response = ApiResponse.Fail("Đã xảy ra lỗi hệ thống, vui lòng thử lại.", 500);
+            return StatusCode(500, response);
+         }
+      }
+
+
+      [HttpGet("orders-by-day")] // API: GET /api/report/orders-by-day?Month=1&&Year=2025
+      [ProducesResponseType(typeof(ApiResponse<OrdersByDayResponse>), 200)]
+      [ProducesResponseType(typeof(ApiResponse), 400)]
+      [ProducesResponseType(typeof(ApiResponse), 500)]
+      public async Task<IActionResult> GetOrdersByDay([FromQuery] OrdersByDayRequest request)
+      {
+         try
+         {
+            var reportData = await _reportService.GetOrdersByDayAsync(request);
+
+            var response = ApiResponse<OrdersByDayResponse>.Ok(reportData, "Lấy báo cáo số đơn hàng theo ngày thành công.");
+
+            return Ok(response);
+         }
+         catch (ArgumentException ex) // Bắt lỗi validation từ Service
+         {
+            return BadRequest(ApiResponse.Fail(ex.Message, 400));
+         }
+         catch (Exception ex)
+         {
+            // (Nên log lỗi 'ex' ở đây)
+            Console.WriteLine(">>>>>>" + ex);
+
+            var response = ApiResponse.Fail("Đã xảy ra lỗi hệ thống 1, vui lòng thử lại.", 500);
+            return StatusCode(500, response);
+         }
+      }
    }
 }

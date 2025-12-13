@@ -59,33 +59,33 @@ namespace dotnet_backend.Services
             }).ToList();
         }
 
-        public async Task<List<PromotionResponse>?> GetPromotionsWithMinOrderAmountGreaterThanAsync(decimal minOrderAmount)
-        {
-            var now = DateTime.UtcNow;
+           public async Task<List<PromotionResponse>?> GetApplicablePromotionsAsync(decimal minOrderAmount)
+           {
+               var now = DateTime.UtcNow;
 
-            var promotions = await _context.Promotions
-                .Where(p => p.MinOrderAmount <= minOrderAmount
-                            && p.EndDate >= now
-                            && p.Status == "active")
-                .ToListAsync();
+               var promotions = await _context.Promotions
+                   .Where(p => p.MinOrderAmount <= minOrderAmount
+                               && p.EndDate >= now
+                               && p.Status == "active")
+                   .ToListAsync();
 
-            var promotionResponses = promotions.Select(p => new PromotionResponse
-            {
-                PromoId = p.PromoId,
-                PromoCode = p.PromoCode,
-                Description = p.Description,
-                DiscountType = p.DiscountType,
-                DiscountValue = p.DiscountValue,
-                StartDate = p.StartDate,
-                EndDate = p.EndDate,
-                MinOrderAmount = p.MinOrderAmount,
-                UsageLimit = p.UsageLimit,
-                UsedCount = p.UsedCount,
-                Status = p.Status
-            }).ToList();
+               var promotionResponses = promotions.Select(p => new PromotionResponse
+               {
+                   PromoId = p.PromoId,
+                   PromoCode = p.PromoCode,
+                   Description = p.Description,
+                   DiscountType = p.DiscountType,
+                   DiscountValue = p.DiscountValue,
+                   StartDate = p.StartDate,
+                   EndDate = p.EndDate,
+                   MinOrderAmount = p.MinOrderAmount,
+                   UsageLimit = p.UsageLimit,
+                   UsedCount = p.UsedCount,
+                   Status = p.Status
+               }).ToList();
 
-            return promotionResponses;
-        }
+               return promotionResponses;
+           }
 
         // Lấy chi tiết khuyến mãi theo ID
         public async Task<PromotionResponse?> GetPromotionByIdAsync(int id)
@@ -123,7 +123,7 @@ namespace dotnet_backend.Services
                 MinOrderAmount = request.MinOrderAmount,
                 UsageLimit = request.UsageLimit,
                 UsedCount = 0,
-                Status = request.Status
+                //Status = request.Status
             };
 
             _context.Promotions.Add(promotion);
@@ -152,9 +152,9 @@ namespace dotnet_backend.Services
             if (promotion == null) return null!; // Hoặc ném NotFound exception nếu muốn
 
             promotion.Description = request.Description ?? promotion.Description;
-            promotion.DiscountType = request.DiscountType ?? promotion.DiscountType;
+            //promotion.DiscountType = request.DiscountType ?? promotion.DiscountType;
             promotion.DiscountValue = request.DiscountValue ?? promotion.DiscountValue;
-            promotion.StartDate = request.StartDate ?? promotion.StartDate;
+            //promotion.StartDate = request.StartDate ?? promotion.StartDate;
             promotion.EndDate = request.EndDate ?? promotion.EndDate;
             promotion.MinOrderAmount = request.MinOrderAmount ?? promotion.MinOrderAmount;
             promotion.UsageLimit = request.UsageLimit ?? promotion.UsageLimit;

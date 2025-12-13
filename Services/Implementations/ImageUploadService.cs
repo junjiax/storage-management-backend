@@ -20,7 +20,7 @@ namespace dotnet_backend.Services
              config.Value.ApiSecret
          );
          _cloudinary = new Cloudinary(account);
-         _cloudinary.Api.Secure = true; // Luôn dùng HTTPS
+         _cloudinary.Api.Secure = true;
       }
 
       public async Task<string> UploadImageAsync(IFormFile file, string publicId)
@@ -40,7 +40,7 @@ namespace dotnet_backend.Services
          {
             File = new FileDescription(file.FileName, stream),
             PublicId = publicId, // Key của bạn
-            Folder = "products", // Tự động tạo thư mục "products"
+            //Folder = "products", // Tự động tạo thư mục "products"
             Overwrite = true // Ghi đè file nếu có
          };
 
@@ -64,11 +64,24 @@ namespace dotnet_backend.Services
 
          var deleteParams = new DeletionParams(publicId)
          {
-            ResourceType = ResourceType.Image // Chỉ định rõ là xóa ảnh
+            ResourceType = ResourceType.Image
          };
 
-         // Gửi yêu cầu xóa đến Cloudinary
-         await _cloudinary.DestroyAsync(deleteParams);
+         // (SỬA) 1. Lấy kết quả trả về
+         DeletionResult deletionResult = await _cloudinary.DestroyAsync(deleteParams);
+         Console.WriteLine($"Cloudinary deletion result: {deletionResult.Result}");
+         // (SỬA) 2. Kiểm tra kết quả
+         // "not found" (không tìm thấy) cũng có thể coi là thành công, 
+         // vì dù sao file cũng không còn tồn tại.
+         if (deletionResult.Result != "ok" && deletionResult.Result != "not found")
+         {
+            // Nếu kết quả không phải "ok" hoặc "not found",
+            // nghĩa là đã có lỗi thực sự (ví dụ: API key sai, v.v.)
+            throw new Exception($"Cloudinary delete error: {deletionResult.Error?.Message ?? "Unknown error"}");
+         }
+
+         // Nếu "ok" hoặc "not found" thì không làm gì cả, 
+         // coi như đã xoá thành công.
       }
    }
 }
