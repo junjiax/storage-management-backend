@@ -25,14 +25,14 @@ namespace dotnet_backend.Services
                 {
                     ProductId = p.ProductId,
                     ProductName = p.ProductName,
-                    Price = p.Price,
                     CategoryId = p.CategoryId,
                     CategoryName = p.Category != null ? p.Category.CategoryName : string.Empty,
                     SupplierId = p.SupplierId,
                     SupplierName = p.Supplier != null ? p.Supplier.Name : string.Empty,
                     Barcode = p.Barcode,
-                    ProductImg = p.ProductImg,
+                    Price = p.Price,
                     Unit = p.Unit,
+                    ProductImg = p.ProductImg != null ? p.ProductImg : string.Empty
                 })
                 .ToListAsync();
 
