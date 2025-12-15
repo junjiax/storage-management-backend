@@ -11,7 +11,16 @@ namespace dotnet_backend.Services.Interfaces
         Task<List<Order>> GetAllOrdersAsync();
         Task UpdateOrderStatusAndInventoryAsync(int id);
         Task<ApiResponse<byte[]>> ExportOrderToPdfAsync(int id);
-        Task<ApiResponse<string>> SendInvoiceEmailAsync(byte[] pdfBytes, int orderId);
+        Task<ApiResponse<string>> QueueInvoiceEmailAsync(byte[] pdf, int orderId, string email);
+        Task<List<Order>> SearchOrdersAsync(
+            string? keyword,
+            string? status,
+            DateTime? fromDate,
+            DateTime? toDate,
+            string sortOrder
+        );
+        Task<List<Order>> GetOrdersByCustomerIdAsync(int customerId);
+
 
     }   
 }

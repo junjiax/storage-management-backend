@@ -117,5 +117,22 @@ namespace dotnet_backend.Services
         {
             return await _context.Customers.AnyAsync(c => c.CustomerId == customerId);
         }
+        
+        public async Task<List<CustomerResponse>> SearchCustomersByNameAsync(string name)
+        {
+            return await _context.Customers
+                .Where(c => c.Name.Contains(name))
+                .Select(c => new CustomerResponse
+                {
+                    CustomerId = c.CustomerId,
+                    Name = c.Name,
+                    Phone = c.Phone,
+                    Email = c.Email,
+                    Address = c.Address,
+                    CreatedAt = c.CreatedAt
+                })
+                .ToListAsync();
+        }
+
     }
 }

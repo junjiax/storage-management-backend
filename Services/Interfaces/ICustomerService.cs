@@ -6,9 +6,11 @@ namespace dotnet_backend.Services
     {
         Task<List<CustomerResponse>> GetCustomerListAsync();
         Task<CustomerResponse?> GetCustomerByIdAsync(int customerId);
-        Task<CustomerResponse> AddCustomerItemAsync(CreateCustomerRequest request); // Thay CustomerRequest
-        Task<CustomerResponse?> UpdateCustomerItemAsync(int customerId, UpdateCustomerRequest request); // Thay CustomerRequest
+        Task<CustomerResponse> AddCustomerItemAsync(CreateCustomerRequest request);
+        Task<CustomerResponse?> UpdateCustomerItemAsync(int customerId, UpdateCustomerRequest request); 
         Task<bool> DeleteCustomerItemAsync(int customerId);
         Task<bool> CustomerExistsAsync(int customerId);
+        Task<List<CustomerResponse>> SearchCustomersByNameAsync(string name);
+
     }
 }

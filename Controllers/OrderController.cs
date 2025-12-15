@@ -171,21 +171,53 @@ namespace dotnet_backend.Controllers
         public async Task<IActionResult> ExportOrderToPdfAndSendToEmail(int id)
         {
             var pdfRes = await _orderService.ExportOrderToPdfAsync(id);
-
             if (!pdfRes.Success)
-            {
                 return StatusCode(pdfRes.StatusCode, pdfRes);
-            }
 
-            var emailRes = await _orderService.SendInvoiceEmailAsync(pdfRes.Data!, id);
-            if (!emailRes.Success)
-            {
-                return StatusCode(emailRes.StatusCode, emailRes);
-            }
+            var order = await _orderService.GetOrderByIdAsync(id);
 
-            return Ok(ApiResponse<string>.Ok(
-                data: $"Invoice #{id} has been sent to customer email.",
-                message: "Invoice was sent."
+            if (string.IsNullOrWhiteSpace(order.Customer?.Email))
+                 return NotFound(ApiResponse<string>.Fail(
+                    message: $"Order with id {id} not found",
+                    statusCode: 404
+                ));
+            var emailRes = await _orderService.QueueInvoiceEmailAsync(
+                pdfRes.Data!,
+                id,
+                order.Customer.Email
+            );
+
+            return Ok(emailRes);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchOrders(
+            string? keyword,
+            string? status,
+            DateTime? fromDate,
+            DateTime? toDate,
+            string sortOrder = "desc"
+        )
+        {
+            var orders = await _orderService.SearchOrdersAsync(
+                keyword, status, fromDate, toDate, sortOrder);
+            var response = orders.Select(MapOrderToResponse).ToList();
+            return Ok(ApiResponse<List<OrderResponse>>.Ok(
+                data: response,
+                message: "Orders retrieved successfully"
+            ));
+        }
+
+        [HttpGet("customer/{customerId:int}")]
+        public async Task<IActionResult> GetOrdersByCustomer(int customerId)
+        {
+            var orders = await _orderService.GetOrdersByCustomerIdAsync(customerId);
+
+            var response = orders.Select(MapOrderToResponse).ToList();
+
+            return Ok(ApiResponse<List<OrderResponse>>.Ok(
+                data: response,
+                message: "Orders retrieved successfully"
             ));
         }
 
@@ -224,5 +256,7 @@ namespace dotnet_backend.Controllers
                 }
             };
         }
+
+        
     }
 }

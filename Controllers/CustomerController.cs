@@ -119,5 +119,27 @@ namespace dotnet_backend.Controllers
                 message: "Customer deleted successfully"
             ));
         }
+
+        // Tìm khách hàng theo tên
+        [HttpGet("search")]
+        public async Task<ActionResult<ApiResponse<List<CustomerResponse>>>> SearchCustomersByName(
+            [FromQuery] string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return BadRequest(ApiResponse<List<CustomerResponse>>.Fail(
+                    message: "Name query is required",
+                    statusCode: 400
+                ));
+            }
+
+            var customers = await _customerService.SearchCustomersByNameAsync(name);
+
+            return Ok(ApiResponse<List<CustomerResponse>>.Ok(
+                data: customers,
+                message: "Customers retrieved successfully"
+            ));
+        }
+
     }
 }
