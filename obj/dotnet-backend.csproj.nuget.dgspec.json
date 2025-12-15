@@ -1,23 +1,21 @@
 {
   "format": 1,
   "restore": {
-    "D:\\storage_management\\backend\\dotnet-backend.csproj": {}
+    "D:\\github-project\\storage-management-backend\\dotnet-backend.csproj": {}
   },
   "projects": {
-    "D:\\storage_management\\backend\\dotnet-backend.csproj": {
+    "D:\\github-project\\storage-management-backend\\dotnet-backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\storage_management\\backend\\dotnet-backend.csproj",
+        "projectUniqueName": "D:\\github-project\\storage-management-backend\\dotnet-backend.csproj",
         "projectName": "dotnet-backend",
-        "projectPath": "D:\\storage_management\\backend\\dotnet-backend.csproj",
-        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "D:\\storage_management\\backend\\obj\\",
+        "projectPath": "D:\\github-project\\storage-management-backend\\dotnet-backend.csproj",
+        "packagesPath": "C:\\Users\\NGOC\\.nuget\\packages\\",
+        "outputPath": "D:\\github-project\\storage-management-backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "D:\\storage_management\\backend\\NuGet.Config",
-          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "D:\\github-project\\storage-management-backend\\NuGet.Config",
+          "C:\\Users\\NGOC\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -42,7 +40,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net9.0": {
@@ -86,6 +84,10 @@
               "target": "Package",
               "version": "[2025.7.4, )"
             },
+            "RabbitMQ.Client": {
+              "target": "Package",
+              "version": "[7.1.2, )"
+            },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[8.0.1, )"
@@ -110,7 +112,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.308/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

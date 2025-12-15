@@ -11,11 +11,16 @@ using MailKit.Security;
 using MailKit.Net.Smtp;
 using System.ComponentModel.DataAnnotations;
 using dotnet_backend.DTOs.Common;
+using RabbitMQ.Client;
+using System.Text;
+using Newtonsoft.Json;
+using dotnet_backend.RabbitMQ;
 
 
 
 namespace dotnet_backend.Services.Implementations
 {
+
     public class OrderService : IOrderService
     {
         private readonly StoreDbContext _context;
@@ -268,52 +273,83 @@ namespace dotnet_backend.Services.Implementations
             return ApiResponse<byte[]>.Ok(pdfBytes);
         }
 
-        public async Task<ApiResponse<string>> SendInvoiceEmailAsync(byte[] pdfBytes, int orderId)
+        public async Task<ApiResponse<string>> QueueInvoiceEmailAsync(byte[] pdf, int orderId, string email)
         {
-            try
+            var job = new EmailJob
             {
-                var order = await GetOrderByIdAsync(orderId);
-                if (order == null)
-                    return ApiResponse<string>.Fail($"Order with id {orderId} not found.", 404);
+                OrderId = orderId,
+                Email = email,
+                PdfBytes = pdf
+            };
 
-                if (string.IsNullOrWhiteSpace(order.Customer?.Email))
-                    return ApiResponse<string>.Fail("Customer does not have an email.", 400);
+            var publisher = new RabbitPublisher();
+            await publisher.PublishAsync("email_queue", JsonConvert.SerializeObject(job));
 
-                var email = new MimeMessage();
-                email.From.Add(new MailboxAddress("Cửa hàng bán lẻ", "xvideosdm@gmail.com"));
-                email.To.Add(new MailboxAddress("", order.Customer.Email));
-                email.Subject = $"Hóa đơn đơn hàng #{orderId}";
-
-                var builder = new BodyBuilder
-                {
-                    TextBody = "Cảm ơn bạn đã mua hàng. Hóa đơn nằm trong file đính kèm."
-                };
-
-                builder.Attachments.Add($"HoaDon_{orderId}.pdf", pdfBytes, new ContentType("application", "pdf"));
-                email.Body = builder.ToMessageBody();
-
-                using var smtp = new SmtpClient();
-                await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-                await smtp.AuthenticateAsync("xvideosdm@gmail.com", "obtv ofxj pejf mubo");
-                await smtp.SendAsync(email);
-                await smtp.DisconnectAsync(true);
-
-                return ApiResponse<string>.Ok($"Invoice #{orderId} has been sent to customer email.");
-            }
-            catch (SmtpCommandException ex)
-            {
-                return ApiResponse<string>.Fail($"SMTP lỗi: {ex.Message}", 500);
-            }
-            catch (SmtpProtocolException ex)
-            {
-                return ApiResponse<string>.Fail($"Lỗi giao thức SMTP: {ex.Message}", 500);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<string>.Fail($"Gửi email thất bại: {ex.Message}", 500);
-            }
+            return ApiResponse<string>.Ok("Email job queued successfully.");
         }
 
+        public async Task<List<Order>> SearchOrdersAsync(
+            string? keyword,
+            string? status,
+            DateTime? fromDate,
+            DateTime? toDate,
+            string sortOrder
+        )
+        {
+            IQueryable<Order> query = _context.Orders
+                .Include(o => o.Customer)
+                .Include(o => o.User)
+                .Include(o => o.Promotion)
+                .Include(o => o.OrderItems)
+                .Include(o => o.Payment);
+
+            // Search theo keyword (Customer / User)
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = query.Where(o =>
+                    o.Customer != null && o.Customer.Name.Contains(keyword));
+            }
+
+            // Filter theo status
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                query = query.Where(o => o.Status == status);
+            }
+
+            // Filter từ ngày
+            if (fromDate.HasValue)
+            {
+                query = query.Where(o => o.OrderDate >= fromDate.Value.Date);
+            }
+
+            // Filter đến ngày
+            if (toDate.HasValue)
+            {
+                var endDate = toDate.Value.Date.AddDays(1).AddTicks(-1);
+                query = query.Where(o => o.OrderDate <= endDate);
+            }
+
+            // Sort theo ngày đặt
+            query = sortOrder == "asc"
+                ? query.OrderBy(o => o.OrderDate)
+                : query.OrderByDescending(o => o.OrderDate);
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<List<Order>> GetOrdersByCustomerIdAsync(int customerId)
+        {
+            return await _context.Orders
+                .Where(o => o.CustomerId == customerId)
+                .Include(o => o.Customer)
+                .Include(o => o.User)
+                .Include(o => o.Promotion)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .Include(o => o.Payment)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
+        }
 
     }
 }
