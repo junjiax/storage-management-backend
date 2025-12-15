@@ -1,7 +1,9 @@
 ﻿using System.Text;
 using dotnet_backend.Data;
+using dotnet_backend.DTOs.Order;
 using dotnet_backend.Interfaces;
 using dotnet_backend.Libraries;
+using dotnet_backend.RabbitMQ;
 using dotnet_backend.Repositories;
 using dotnet_backend.Services;
 using dotnet_backend.Services.Implementations;
@@ -57,7 +59,14 @@ builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddSingleton<RabbitPublisher>();
+builder.Services.AddHostedService<EmailWorker>();
+builder.Services.AddSingleton<EmailService>();
+builder.Services.AddHostedService(provider => provider.GetRequiredService<EmailWorker>());
 
+
+// Initialize RabbitMq
+await RabbitMqInitializer.InitializeAsync();
 
 // JWT Authentication
 var jwtSection = builder.Configuration.GetSection("Jwt");
@@ -81,10 +90,26 @@ builder.Services.AddAuthentication(options =>
 });
 
 
+
+
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        await RabbitMqInitializer.InitializeAsync();
+        Console.WriteLine("RabbitMQ initialized successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Failed to initialize RabbitMQ: {ex.Message}");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
