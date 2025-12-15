@@ -1,4 +1,4 @@
-﻿using dotnet_backend.DTOs.Common;
+using dotnet_backend.DTOs.Common;
 using dotnet_backend.DTOs.Product;
 using dotnet_backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +25,16 @@ namespace dotnet_backend.Controllers
             return Ok(ApiResponse<List<ProductResponse>>.Ok(
                 data: products,
                 message: "Products retrieved successfully"
+            ));
+        }
+
+        [HttpGet("category/{categoryId}")]
+        public async Task<ActionResult<ApiResponse<List<ProductResponse>>>> GetProductsByCategory(int categoryId)
+        {
+            var products = await _productService.GetProductsByCategoryAsync(categoryId);
+            return Ok(ApiResponse<List<ProductResponse>>.Ok(
+                data: products,
+                message: "Products filtered by category retrieved successfully"
             ));
         }
 
