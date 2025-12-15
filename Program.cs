@@ -4,6 +4,7 @@ using dotnet_backend.DTOs.Order;
 using dotnet_backend.Interfaces;
 using dotnet_backend.Libraries;
 using dotnet_backend.RabbitMQ;
+using dotnet_backend.Models;
 using dotnet_backend.Repositories;
 using dotnet_backend.Services;
 using dotnet_backend.Services.Implementations;
@@ -63,6 +64,7 @@ builder.Services.AddSingleton<RabbitPublisher>();
 builder.Services.AddHostedService<EmailWorker>();
 builder.Services.AddSingleton<EmailService>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<EmailWorker>());
+builder.Services.AddScoped<IPromotionService, PromotionService>();
 
 
 // Initialize RabbitMq
