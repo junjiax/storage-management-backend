@@ -252,7 +252,8 @@ namespace dotnet_backend.Repositories
          // === 3. QUERY KỲ HIỆN TẠI ===
          IQueryable<Order> currentOrdersQuery = _context.Orders
              .Where(o => o.OrderDate >= currentStartDate &&
-                         o.OrderDate < currentEndDateExclusive);
+                         o.OrderDate < currentEndDateExclusive &&
+                o.Status == "paid");
 
          decimal totalRevenue = await currentOrdersQuery.SumAsync(o => o.TotalAmount);
          int totalOrders = await currentOrdersQuery.CountAsync();
@@ -269,7 +270,8 @@ namespace dotnet_backend.Repositories
 
          IQueryable<Order> prevOrdersQuery = _context.Orders
              .Where(o => o.OrderDate >= prevStartDate &&
-                         o.OrderDate < prevEndExclusive);
+                         o.OrderDate < prevEndExclusive &&
+                o.Status == "paid");
 
          totalPrevRevenue = await prevOrdersQuery.SumAsync(o => o.TotalAmount);
 
@@ -279,7 +281,7 @@ namespace dotnet_backend.Repositories
          if (customerIdsInPeriod.Any())
          {
             var firstOrderDates = _context.Orders
-                .Where(o => o.CustomerId != null && customerIdsInPeriod.Contains(o.CustomerId.Value))
+                .Where(o => o.CustomerId != null && o.Status == "paid" && customerIdsInPeriod.Contains(o.CustomerId.Value))
                 .GroupBy(o => o.CustomerId.Value)
                 .Select(g => new { FirstOrderDate = g.Min(o => o.OrderDate) });
 
